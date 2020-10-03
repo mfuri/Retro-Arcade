@@ -37,7 +37,7 @@ class Player(pygame.sprite.Sprite):
 class Background(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)  #call Sprite initializer
-        self.image = pygame.image.load('assets/background.png')
+        self.image = pygame.image.load('assets/background2.png')
         self.rect = self.image.get_rect()
         self.rect.center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
 
