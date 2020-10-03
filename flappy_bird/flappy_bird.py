@@ -81,3 +81,4 @@ pygame.quit()
 
 #code source: https://realpython.com/pygame-a-primer/
 #code source: https://stackoverflow.com/questions/28005641/how-to-add-a-background-image-into-pygame
+#sounds source: https://opengameart.org/content/512-sound-effects-8-bit-style
