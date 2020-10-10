@@ -2,7 +2,7 @@
 #high score should be number of seconds
 #press space to continue or q to quit
 #contributers: Michael and Mackenzie
-
+import random
 import os
 from os import environ
 environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
@@ -31,6 +31,10 @@ class Player(pygame.sprite.Sprite):
         self.surf = pygame.image.load('assets/our_bird.png').convert_alpha()
         self.rect = self.surf.get_rect()
         self.rect.center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
+        self.movey = 0
+        self.movex = 0
+    def gravity(self):
+        self.movey += 10
 
 #Defines background image, pulls image from assets folder
 #Image source: https://www.flickr.com/photos/91152366@N06/21368054180/
@@ -74,6 +78,8 @@ while running:
     screen.fill([255, 255, 255])
     screen.blit(bg.image, bg.rect)
     screen.blit(player.surf, player.rect)
+    player.gravity()
+    player.update()
 
     pygame.display.flip()
 #exits game window
