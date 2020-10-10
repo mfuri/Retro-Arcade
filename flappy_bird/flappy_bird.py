@@ -5,6 +5,7 @@
 import random
 import os
 from os import environ
+import sys
 environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 
 import pygame
@@ -33,8 +34,12 @@ class Player(pygame.sprite.Sprite):
         self.rect.center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
         self.movey = 0
         self.movex = 0
+        self.rect.y = SCREEN_WIDTH / 2
     def gravity(self):
-        self.movey += 10
+        self.rect.y += 5
+    def handle_keys(self):
+        key = pygame.key.get_pressed()
+        
 
 #Defines background image, pulls image from assets folder
 #Image source: https://www.flickr.com/photos/91152366@N06/21368054180/
@@ -68,18 +73,37 @@ for entity in all_sprites:
 pygame.display.flip()
 pressed_keys = pygame.key.get_pressed()
 
+jump = False
+
 #game loop
 while running:
+    
     #turn false when user hits green pipe or the ground or the top of the screen
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+    player.update()
     #loads background image into game
     screen.fill([255, 255, 255])
     screen.blit(bg.image, bg.rect)
-    screen.blit(player.surf, player.rect)
+    #screen.blit(player.surf, player.rect)
+    screen.blit(player.surf, (SCREEN_WIDTH / 2, player.rect.y))
+    if event.type == KEYDOWN:
+        if event.key == K_SPACE:
+            jump = True
+    
+    if event.type == KEYUP:
+        if event.key == K_SPACE:
+            jump = False
+        if event.key == K_q:
+            pygame.quit()
+            sys.exit()
+        if event.key == K_ESCAPE:
+            pygame.quit()
+            sys.exit()
+
+
     player.gravity()
-    player.update()
 
     pygame.display.flip()
 #exits game window
