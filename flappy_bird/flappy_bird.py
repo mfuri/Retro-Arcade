@@ -28,7 +28,7 @@ SCREEN_HEIGHT = 500
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super(Player, self).__init__()
-        self.surf = pygame.image.load('assets/our_bird.png').convert_alpha()
+        self.surf = pygame.image.load('assets/sprites/our_bird.png').convert_alpha()
         self.rect = self.surf.get_rect()
         self.rect.center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
         self.movey = 0
@@ -41,7 +41,7 @@ class Player(pygame.sprite.Sprite):
 class Background(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)  #call Sprite initializer
-        self.image = pygame.image.load('assets/background2.png')
+        self.image = pygame.image.load('assets/sprites/background2.png')
         self.rect = self.image.get_rect()
         self.rect.center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
 
