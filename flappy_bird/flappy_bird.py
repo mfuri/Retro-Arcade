@@ -15,6 +15,7 @@ from pygame.locals import *
 from pygame.locals import (
     K_SPACE,
     K_q,
+    K_ESCAPE,
     QUIT,
 )
 
@@ -39,6 +40,8 @@ class Player(pygame.sprite.Sprite):
         self.rect.y += 5
     def handle_keys(self):
         key = pygame.key.get_pressed()
+    def jump(self):
+        self.rect.y -= 10
         
 
 #Defines background image, pulls image from assets folder
@@ -73,7 +76,8 @@ for entity in all_sprites:
 pygame.display.flip()
 pressed_keys = pygame.key.get_pressed()
 
-jump = False
+# Boolean to store jump characteristic
+isJump = False
 
 #game loop
 while running:
@@ -82,28 +86,31 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-    player.update()
+    # Controls -- Space = jump; q, escape = quit
+    if event.type == KEYDOWN:
+        if event.key == K_SPACE:
+            isJump = True
+            player.rect.y -= 10
+    elif event.type == KEYUP:
+        if event.key == K_SPACE:
+            isJump = False
+            player.rect.y -= 10
+        elif event.key == K_q:
+            pygame.quit()
+            sys.exit()
+        elif event.key == K_ESCAPE:
+            pygame.quit()
+            sys.exit()
+    
+    #player.update()
+
     #loads background image into game
     screen.fill([255, 255, 255])
     screen.blit(bg.image, bg.rect)
+    player.gravity()
     #screen.blit(player.surf, player.rect)
     screen.blit(player.surf, (SCREEN_WIDTH / 2, player.rect.y))
-    if event.type == KEYDOWN:
-        if event.key == K_SPACE:
-            jump = True
     
-    if event.type == KEYUP:
-        if event.key == K_SPACE:
-            jump = False
-        if event.key == K_q:
-            pygame.quit()
-            sys.exit()
-        if event.key == K_ESCAPE:
-            pygame.quit()
-            sys.exit()
-
-
-    player.gravity()
 
     pygame.display.flip()
 #exits game window
