@@ -76,6 +76,27 @@ for entity in all_sprites:
 pygame.display.flip()
 pressed_keys = pygame.key.get_pressed()
 
+#Press Space to Start Loop
+while running:
+    for event in pygame.event.get():
+            if event.type == pygame.QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
+                pygame.quit()
+                sys.exit()
+            if event.type == KEYDOWN and event.key == K_SPACE:
+                player.jump()
+                running = False
+    #loads background image into game
+    screen.fill([255, 255, 255])
+    screen.blit(bg.image, bg.rect)
+    screen.blit(player.surf, ((SCREEN_WIDTH / 2)-10, player.rect.y))
+
+    # Trying to add welcome image
+    #welcome = pygame.image.load("assets/sprites/welcome_screen.png")
+    #screen.blit(welcome,)
+    pygame.display.flip()
+
+running = True
+#main game loop
 #game loop
 while running:
     
@@ -101,7 +122,7 @@ while running:
     screen.blit(bg.image, bg.rect)
     player.gravity()
     #screen.blit(player.surf, player.rect)
-    screen.blit(player.surf, (SCREEN_WIDTH / 2, player.rect.y))
+    screen.blit(player.surf, ((SCREEN_WIDTH / 2)-10, player.rect.y))
     
 
     pygame.display.flip()
@@ -111,3 +132,4 @@ pygame.quit()
 #code source: https://realpython.com/pygame-a-primer/
 #code source: https://stackoverflow.com/questions/28005641/how-to-add-a-background-image-into-pygame
 #sounds source: https://opengameart.org/content/512-sound-effects-8-bit-style
+#numbers source: https://www.flaticon.com/home
