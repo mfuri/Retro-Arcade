@@ -53,6 +53,13 @@ class Background(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
 
+class Welcome_Overlay(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.image.load('assets/sprites/welcome_screen.png')
+        self.rect = self.image.get_rect()
+        self.rect.center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
+
 #Creates timer and screen objects    
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 clock = pygame.time.Clock()
@@ -62,6 +69,7 @@ running = True
 
 #instantiates background image object
 bg = Background()
+welcome = Welcome_Overlay()
 
 #Initializes player and assigns player class
 player = Player()
@@ -90,9 +98,8 @@ while running:
     screen.blit(bg.image, bg.rect)
     screen.blit(player.surf, ((SCREEN_WIDTH / 2)-10, player.rect.y))
 
-    # Trying to add welcome image
-    #welcome = pygame.image.load("assets/sprites/welcome_screen.png")
-    #screen.blit(welcome,)
+    #Welcome image
+    screen.blit(welcome.image,welcome.rect)
     pygame.display.flip()
 
 running = True
