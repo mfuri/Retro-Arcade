@@ -37,11 +37,11 @@ class Player(pygame.sprite.Sprite):
         self.movex = 0
         self.rect.y = SCREEN_WIDTH / 2
     def gravity(self):
-        self.rect.y += 5
+        self.rect.y += 3
     def handle_keys(self):
         key = pygame.key.get_pressed()
     def jump(self):
-        self.rect.y -= 10
+        self.rect.y -= 100
         
 
 #Defines background image, pulls image from assets folder
@@ -76,9 +76,6 @@ for entity in all_sprites:
 pygame.display.flip()
 pressed_keys = pygame.key.get_pressed()
 
-# Boolean to store jump characteristic
-isJump = False
-
 #game loop
 while running:
     
@@ -87,20 +84,15 @@ while running:
         if event.type == pygame.QUIT:
             running = False
     # Controls -- Space = jump; q, escape = quit
-    if event.type == KEYDOWN:
-        if event.key == K_SPACE:
-            isJump = True
-            player.rect.y -= 10
-    elif event.type == KEYUP:
-        if event.key == K_SPACE:
-            isJump = False
-            player.rect.y -= 10
-        elif event.key == K_q:
-            pygame.quit()
-            sys.exit()
-        elif event.key == K_ESCAPE:
-            pygame.quit()
-            sys.exit()
+        if event.type == KEYDOWN and event.key == K_SPACE:
+            player.jump()
+        elif event.type == KEYUP:
+            if event.key == K_q:
+                pygame.quit()
+                sys.exit()
+            elif event.key == K_ESCAPE:
+                pygame.quit()
+                sys.exit()
     
     #player.update()
 
