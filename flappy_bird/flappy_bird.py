@@ -53,12 +53,18 @@ class Background(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
 
+#Creates text overlay welcome message
 class Welcome_Overlay(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.image.load('assets/sprites/welcome_screen.png')
         self.rect = self.image.get_rect()
         self.rect.center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
+
+#Creates sounds to be used in-game
+flap_sound = pygame.mixer.Sound("assets/sounds/flap.wav")
+death_sound = pygame.mixer.Sound("assets/sounds/death.wav")
+error_sound = pygame.mixer.Sound("assets/sounds/error2.wav")
 
 #Creates timer and screen objects    
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -90,9 +96,13 @@ while running:
             if event.type == pygame.QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
                 pygame.quit()
                 sys.exit()
-            if event.type == KEYDOWN and event.key == K_SPACE:
+            elif event.type == KEYDOWN and event.key == K_SPACE:
                 player.jump()
+                pygame.mixer.Sound.play(flap_sound)
                 running = False
+            elif event.type == KEYDOWN and event.key != K_SPACE:
+                pygame.mixer.Sound.play(error_sound)
+
     #loads background image into game
     screen.fill([255, 255, 255])
     screen.blit(bg.image, bg.rect)
@@ -114,6 +124,7 @@ while running:
     # Controls -- Space = jump; q, escape = quit
         if event.type == KEYDOWN and event.key == K_SPACE:
             player.jump()
+            pygame.mixer.Sound.play(flap_sound)
         elif event.type == KEYUP:
             if event.key == K_q:
                 pygame.quit()
