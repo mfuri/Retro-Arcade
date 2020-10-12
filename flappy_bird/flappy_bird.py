@@ -35,13 +35,19 @@ class Player(pygame.sprite.Sprite):
         self.rect.center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
         self.movey = 0
         self.movex = 0
-        self.rect.y = SCREEN_WIDTH / 2
+        self.rect.y = SCREEN_WIDTH / 2 - 60
+        self.alive = True
     def gravity(self):
         self.rect.y += 3
     def handle_keys(self):
         key = pygame.key.get_pressed()
     def jump(self):
         self.rect.y -= 100
+    #Checks if sprite collides with enemies
+    def update(self):
+        hit_list = pygame.sprite.spritecollide(self, enemy_list, False)
+        for enemy in hit_list:
+            self.alive = False
         
 
 #Defines background image, pulls image from assets folder
@@ -53,14 +59,29 @@ class Background(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
 
+#Code source: https://opensource.com/article/18/5/pygame-enemy
+class Base(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.image.load("assets/sprites/base2.png").convert_alpha()
+        self.rect = self.image.get_rect()
+        self.rect.center = (SCREEN_WIDTH / 2, 450)
+
+
 #Creates text overlay welcome message
 class Welcome_Overlay(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load('assets/sprites/welcome_screen.png')
+        self.image = pygame.image.load('assets/sprites/welcome_screen.png').convert_alpha()
         self.rect = self.image.get_rect()
         self.rect.center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
 
+class Enemy(pygame.sprite.Sprite):
+    def __init__(self):
+        super(Player, self).__init__()
+        self.surf = pygame.image.load('assets/sprites/spear.png').convert_alpha()
+        self.rect = self.surf.get_rect()
+        
 #Creates sounds to be used in-game
 flap_sound = pygame.mixer.Sound("assets/sounds/flap.wav")
 death_sound = pygame.mixer.Sound("assets/sounds/death.wav")
@@ -76,6 +97,13 @@ running = True
 #instantiates background image object
 bg = Background()
 welcome = Welcome_Overlay()
+
+#Instantiate enemies
+base = Base()
+
+enemy_list = pygame.sprite.Group()
+enemy_list.add(base)
+
 
 #Initializes player and assigns player class
 player = Player()
@@ -106,7 +134,8 @@ while running:
     #loads background image into game
     screen.fill([255, 255, 255])
     screen.blit(bg.image, bg.rect)
-    screen.blit(player.surf, ((SCREEN_WIDTH / 2)-10, player.rect.y))
+    screen.blit(player.surf, ((SCREEN_WIDTH / 2)-17, player.rect.y))
+    screen.blit(base.image, base.rect)
 
     #Welcome image
     screen.blit(welcome.image,welcome.rect)
@@ -133,14 +162,16 @@ while running:
                 pygame.quit()
                 sys.exit()
     
-    #player.update()
-
+    player.update()
+    if player.alive == False:
+      running = False
     #loads background image into game
     screen.fill([255, 255, 255])
     screen.blit(bg.image, bg.rect)
     player.gravity()
     #screen.blit(player.surf, player.rect)
-    screen.blit(player.surf, ((SCREEN_WIDTH / 2)-10, player.rect.y))
+    screen.blit(player.surf, ((SCREEN_WIDTH / 2)-17, player.rect.y))
+    screen.blit(base.image,base.rect)
     
 
     pygame.display.flip()
