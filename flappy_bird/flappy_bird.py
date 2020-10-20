@@ -6,6 +6,7 @@ import random
 import os
 from os import environ
 import sys
+import random
 environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 
 import pygame
@@ -42,7 +43,7 @@ class Player(pygame.sprite.Sprite):
     def handle_keys(self):
         key = pygame.key.get_pressed()
     def jump(self):
-        self.rect.y -= 100
+        self.rect.y -= 80
     #Checks if sprite collides with enemies
     def update(self):
         hit_list = pygame.sprite.spritecollide(self, enemy_list, False)
@@ -65,7 +66,7 @@ class Base(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.image.load("assets/sprites/base2.png").convert_alpha()
         self.rect = self.image.get_rect()
-        self.rect.center = (SCREEN_WIDTH / 2, 450)
+        self.rect.center = (SCREEN_WIDTH / 2, 475)
 
 
 #Creates text overlay welcome message
@@ -76,11 +77,35 @@ class Welcome_Overlay(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
 
-class Enemy(pygame.sprite.Sprite):
+class Pipe(pygame.sprite.Sprite):
     def __init__(self):
-        super(Player, self).__init__()
-        self.surf = pygame.image.load('assets/sprites/spear.png').convert_alpha()
-        self.rect = self.surf.get_rect()
+        #create pipe
+        self.pipe_image = pygame.image.load('assets/sprites/spear.png')
+        #self.pipe_image = pygame.transform.scale2x(self.pipe_image)
+
+    def create_new_pipe(self):
+        pipe_heights = [350, 300, 250, 200, 180]
+        bottom_pipe = random.choice(pipe_heights)
+        top_pipe = bottom_pipe - 110
+        new_top_pipe = self.pipe_image.get_rect(midbottom = (500, top_pipe))
+        new_bottom_pipe = self.pipe_image.get_rect(midtop = (500, bottom_pipe))
+        return new_top_pipe, new_bottom_pipe
+    
+    def move_pipes(self, pipes):
+        for pipe in pipes:
+            pipe.centerx -= 5
+        return pipes
+
+    def draw_pipes(self, pipes):
+        for pipe in pipes:
+            if(pipe.bottom >= 500):
+                screen.blit(self.pipe_image, pipe)
+
+            else:
+                flipped_pipe = pygame.transform.flip(self.pipe_image, False, True)
+                screen.blit(flipped_pipe, pipe)
+    
+
         
 #Creates sounds to be used in-game
 flap_sound = pygame.mixer.Sound("assets/sounds/flap.wav")
@@ -101,6 +126,9 @@ welcome = Welcome_Overlay()
 
 #Instantiate enemies
 base = Base()
+#pipe = Pipe(0)
+
+
 
 enemy_list = pygame.sprite.Group()
 enemy_list.add(base)
@@ -110,6 +138,12 @@ enemy_list.add(base)
 player = Player()
 all_sprites = pygame.sprite.Group()
 all_sprites.add(player)
+
+#initializes pipe
+pipe = Pipe()
+pipes = []
+SPAWNPIPE = pygame.USEREVENT
+pygame.time.set_timer(SPAWNPIPE, 1250)
 
 screen.blit(player.surf, player.rect)
 for entity in all_sprites:
@@ -125,6 +159,7 @@ while flappy:
     player = Player()
     all_sprites = pygame.sprite.Group()
     all_sprites.add(player)
+   
     running = True
     #Press Space to Start Loop
     while running:
@@ -144,7 +179,7 @@ while flappy:
         screen.blit(bg.image, bg.rect)
         screen.blit(player.surf, ((SCREEN_WIDTH / 2)-17, player.rect.y))
         screen.blit(base.image, base.rect)
-
+        #pipe.draw(screen)
         #Welcome image
         screen.blit(welcome.image,welcome.rect)
         pygame.display.flip()
@@ -152,9 +187,9 @@ while flappy:
     running = True
     #main game loop
     #game loop
+    
     while running:
-        
-        #turn false when user hits green pipe or the ground or the top of the screen
+        #turn false when user hits pipe or the ground or the top of the screen
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -165,7 +200,9 @@ while flappy:
             elif event.type == KEYDOWN and (event.key == K_q or K_ESCAPE):
                 pygame.quit()
                 sys.exit()
-        
+            if event.type == SPAWNPIPE:
+                pipes.extend(pipe.create_new_pipe())
+
         player.update()
         if player.alive == False:
             pygame.mixer.Sound.play(death_sound)
@@ -177,6 +214,10 @@ while flappy:
         player.gravity()
         screen.blit(player.surf, ((SCREEN_WIDTH / 2)-17, player.rect.y))
         screen.blit(base.image,base.rect)
+
+        #draw pipes
+        pipe.draw_pipes(pipes)
+        pipe.move_pipes(pipes)
         pygame.display.flip()
     running = True
     while running:
@@ -201,6 +242,7 @@ while flappy:
         screen.blit(bg.image, bg.rect)
         screen.blit(base.image,base.rect)
         pygame.display.flip()
+        pipes = []
 #exits game window
 pygame.quit()
 
@@ -208,3 +250,4 @@ pygame.quit()
 #code source: https://stackoverflow.com/questions/28005641/how-to-add-a-background-image-into-pygame
 #sounds source: https://opengameart.org/content/512-sound-effects-8-bit-style
 #numbers source: https://www.flaticon.com/home
+#pipe code reference: https://www.youtube.com/watch?v=UZg49z76cLw
