@@ -108,7 +108,6 @@ class Pipe(pygame.sprite.Sprite):
         for pipe in pipes:
             if bird.rect.colliderect(pipe):
                 return True
-            print(pipe.centerx)
             if pipe.centerx <= 0:
                 pipes.remove(pipe)
         return False
