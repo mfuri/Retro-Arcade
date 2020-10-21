@@ -11,6 +11,11 @@ environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 
 import pygame
 from pygame.locals import *
+import pygame.freetype
+
+pygame.freetype.init()
+
+score_font = pygame.freetype.Font('assets/Corporation_Games.otf', size=0, font_index=0, resolution=0, ucs4=False)
 
 #Imports keyboard controls for Pygame
 from pygame.locals import (
@@ -49,7 +54,6 @@ class Player(pygame.sprite.Sprite):
         hit_list = pygame.sprite.spritecollide(self, enemy_list, False)
         for enemy in hit_list:
             self.alive = False
-        
 
 #Defines background image, pulls image from assets folder
 #Image source: https://www.flickr.com/photos/91152366@N06/21368054180/
@@ -81,7 +85,6 @@ class Pipe(pygame.sprite.Sprite):
     def __init__(self):
         #create pipe
         self.pipe_image = pygame.image.load('assets/sprites/spear.png')
-        #self.pipe_image = pygame.transform.scale2x(self.pipe_image)
 
     def create_new_pipe(self):
         pipe_heights = [350, 300, 250, 200, 180]
@@ -104,6 +107,7 @@ class Pipe(pygame.sprite.Sprite):
             else:
                 flipped_pipe = pygame.transform.flip(self.pipe_image, False, True)
                 screen.blit(flipped_pipe, pipe)
+                
     def check_collision(self, pipes, bird):
         for pipe in pipes:
             if bird.rect.colliderect(pipe):
@@ -111,7 +115,8 @@ class Pipe(pygame.sprite.Sprite):
             if pipe.centerx <= 0:
                 pipes.remove(pipe)
         return False
-        
+
+
 #Creates sounds to be used in-game
 flap_sound = pygame.mixer.Sound("assets/sounds/flap.wav")
 death_sound = pygame.mixer.Sound("assets/sounds/death.wav")
@@ -121,6 +126,10 @@ restart_sound = pygame.mixer.Sound("assets/sounds/restart.wav")
 #Creates timer and screen objects    
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 clock = pygame.time.Clock()
+
+# Function to draw score on screen   
+def stats(score):
+    score_font.render_to(screen, (240, 50), score, (255,255,255), None, size=64)
 
 #game running variable
 running = True
@@ -213,6 +222,7 @@ while flappy:
         player.update()
         #pipe.check_collision(pipes, player)
         if pipe.check_collision(pipes, player):
+            pygame.mixer.Sound.play(death_sound)
             print("You lose")
             running = False
 
@@ -230,7 +240,9 @@ while flappy:
         #draw pipes
         pipe.draw_pipes(pipes)
         pipe.move_pipes(pipes)
+        stats(str(points))
         pygame.display.flip()
+        
     running = True
     while running:
         #turn false when user hits green pipe or the ground or the top of the screen
@@ -253,6 +265,7 @@ while flappy:
         screen.fill([255, 255, 255])
         screen.blit(bg.image, bg.rect)
         screen.blit(base.image,base.rect)
+        stats(str(points))
         pygame.display.flip()
         pipes = []
 print(points)
