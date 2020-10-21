@@ -80,7 +80,7 @@ class Welcome_Overlay(pygame.sprite.Sprite):
 class Pipe(pygame.sprite.Sprite):
     def __init__(self):
         #create pipe
-        self.pipe_image = pygame.image.load('assets/sprites/spear.png')
+        self.pipe_image = pygame.image.load('assets/sprites/pipe-gold.png')
         #self.pipe_image = pygame.transform.scale2x(self.pipe_image)
 
     def create_new_pipe(self):
@@ -89,6 +89,7 @@ class Pipe(pygame.sprite.Sprite):
         top_pipe = bottom_pipe - 110
         new_top_pipe = self.pipe_image.get_rect(midbottom = (500, top_pipe))
         new_bottom_pipe = self.pipe_image.get_rect(midtop = (500, bottom_pipe))
+
         return new_top_pipe, new_bottom_pipe
     
     def move_pipes(self, pipes):
@@ -100,12 +101,16 @@ class Pipe(pygame.sprite.Sprite):
         for pipe in pipes:
             if(pipe.bottom >= 500):
                 screen.blit(self.pipe_image, pipe)
-
             else:
                 flipped_pipe = pygame.transform.flip(self.pipe_image, False, True)
                 screen.blit(flipped_pipe, pipe)
-    
-
+    def check_collision(self, pipes, bird):
+        for pipe in pipes:
+            if bird.rect.colliderect(pipe):
+                print("collision")
+            print(pipe.centerx)
+            if pipe.centerx <= 0:
+                pipes.remove(pipe)
         
 #Creates sounds to be used in-game
 flap_sound = pygame.mixer.Sound("assets/sounds/flap.wav")
@@ -128,11 +133,8 @@ welcome = Welcome_Overlay()
 base = Base()
 #pipe = Pipe(0)
 
-
-
 enemy_list = pygame.sprite.Group()
 enemy_list.add(base)
-
 
 #Initializes player and assigns player class
 player = Player()
@@ -143,6 +145,8 @@ all_sprites.add(player)
 pipe = Pipe()
 pipes = []
 SPAWNPIPE = pygame.USEREVENT
+
+#spawns pipe every 1.25 seconds
 pygame.time.set_timer(SPAWNPIPE, 1250)
 
 screen.blit(player.surf, player.rect)
@@ -154,12 +158,13 @@ pygame.display.flip()
 pressed_keys = pygame.key.get_pressed()
 
 flappy = True
-
+points = 0
 while flappy:
     player = Player()
     all_sprites = pygame.sprite.Group()
     all_sprites.add(player)
-   
+    points = 0
+
     running = True
     #Press Space to Start Loop
     while running:
@@ -196,14 +201,17 @@ while flappy:
         # Controls -- Space = jump; q, escape = quit
             if event.type == KEYDOWN and event.key == K_SPACE:
                 player.jump()
+                points += 1
                 pygame.mixer.Sound.play(flap_sound)
             elif event.type == KEYDOWN and (event.key == K_q or K_ESCAPE):
                 pygame.quit()
                 sys.exit()
             if event.type == SPAWNPIPE:
                 pipes.extend(pipe.create_new_pipe())
+                
 
         player.update()
+        pipe.check_collision(pipes, player)
         if player.alive == False:
             pygame.mixer.Sound.play(death_sound)
             print("You lose")
@@ -243,6 +251,7 @@ while flappy:
         screen.blit(base.image,base.rect)
         pygame.display.flip()
         pipes = []
+print(points)
 #exits game window
 pygame.quit()
 
