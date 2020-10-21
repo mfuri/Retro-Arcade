@@ -131,6 +131,10 @@ clock = pygame.time.Clock()
 def stats(score):
     score_font.render_to(screen, (240, 50), score, (255,255,255), None, size=64)
 
+def lose(score):
+    score_font.render_to(screen,(80, 120), "You lose: " + score, (255,255,255), None, size=64)
+
+
 #game running variable
 running = True
 
@@ -224,11 +228,13 @@ while flappy:
         if pipe.check_collision(pipes, player):
             pygame.mixer.Sound.play(death_sound)
             print("You lose")
+            lose(str(points))
             running = False
 
         if player.alive == False:
             pygame.mixer.Sound.play(death_sound)
             print("You lose")
+            lose(str(points))
             running = False
         #loads background image into game
         screen.fill([255, 255, 255])
@@ -266,6 +272,7 @@ while flappy:
         screen.blit(bg.image, bg.rect)
         screen.blit(base.image,base.rect)
         stats(str(points))
+        lose(str(points))
         pygame.display.flip()
         pipes = []
 print(points)
