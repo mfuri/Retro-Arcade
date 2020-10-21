@@ -127,12 +127,14 @@ restart_sound = pygame.mixer.Sound("assets/sounds/restart.wav")
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 clock = pygame.time.Clock()
 
+# Source: https://opensource.com/article/20/1/add-scorekeeping-your-python-game
 # Function to draw score on screen   
 def stats(score):
     score_font.render_to(screen, (240, 50), score, (255,255,255), None, size=64)
 
 def lose(score):
     score_font.render_to(screen,(80, 120), "You lose: " + score, (255,255,255), None, size=64)
+
 
 
 #game running variable
