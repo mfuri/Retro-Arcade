@@ -80,7 +80,7 @@ class Welcome_Overlay(pygame.sprite.Sprite):
 class Pipe(pygame.sprite.Sprite):
     def __init__(self):
         #create pipe
-        self.pipe_image = pygame.image.load('assets/sprites/pipe-gold.png')
+        self.pipe_image = pygame.image.load('assets/sprites/spear.png')
         #self.pipe_image = pygame.transform.scale2x(self.pipe_image)
 
     def create_new_pipe(self):
