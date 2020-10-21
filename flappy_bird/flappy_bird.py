@@ -86,7 +86,7 @@ class Pipe(pygame.sprite.Sprite):
     def create_new_pipe(self):
         pipe_heights = [350, 300, 250, 200, 180]
         bottom_pipe = random.choice(pipe_heights)
-        top_pipe = bottom_pipe - 110
+        top_pipe = bottom_pipe - 150
         new_top_pipe = self.pipe_image.get_rect(midbottom = (500, top_pipe))
         new_bottom_pipe = self.pipe_image.get_rect(midtop = (500, bottom_pipe))
 
@@ -107,10 +107,11 @@ class Pipe(pygame.sprite.Sprite):
     def check_collision(self, pipes, bird):
         for pipe in pipes:
             if bird.rect.colliderect(pipe):
-                print("collision")
+                return True
             print(pipe.centerx)
             if pipe.centerx <= 0:
                 pipes.remove(pipe)
+        return False
         
 #Creates sounds to be used in-game
 flap_sound = pygame.mixer.Sound("assets/sounds/flap.wav")
@@ -211,7 +212,11 @@ while flappy:
                 
 
         player.update()
-        pipe.check_collision(pipes, player)
+        #pipe.check_collision(pipes, player)
+        if pipe.check_collision(pipes, player):
+            print("You lose")
+            running = False
+
         if player.alive == False:
             pygame.mixer.Sound.play(death_sound)
             print("You lose")
