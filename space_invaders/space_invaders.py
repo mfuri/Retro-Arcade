@@ -12,7 +12,8 @@ environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 import pygame
 from pygame.locals import *
 
-import pygame
+SCREEN_WIDTH = 500
+SCREEN_HEIGHT = 500
 
 class Ship(pygame.sprite.Sprite):
     def __init__(self):
