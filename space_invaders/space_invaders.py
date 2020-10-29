@@ -61,6 +61,7 @@ class Rocket(pygame.sprite.Sprite):
     def draw_rockets(self, rocket_list):
         for rocket in rocket_list:
             screen.blit(self.surf, rocket)
+            
     def shoot(self):
         self.rect.y -= 2
 
@@ -127,7 +128,7 @@ while True:
             pygame.quit()
             sys.exit()
         elif event.type == KEYDOWN and event.key == K_SPACE:
-            rockets.append(Rocket(ship.rect.x, ship.rect.y))
+            rockets.append(Rocket(ship.rect.x+11, ship.rect.y))
     #Press and hold arrow keys allow ship to move calling move functions
     if keys[pygame.K_LEFT]:
         ship.move_left()
