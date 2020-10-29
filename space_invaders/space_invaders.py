@@ -58,6 +58,9 @@ class Rocket(pygame.sprite.Sprite):
         self.rect = self.surf.get_rect()
         self.rect.x = x
         self.rect.y = y
+    def draw_rockets(self, rocket_list):
+        for rocket in rocket_list:
+            screen.blit(self.surf, rocket)
     def shoot(self):
         self.rect.y -= 2
 
@@ -75,8 +78,8 @@ class Alien(pygame.sprite.Sprite):
         self.alien_image = pygame.image.load('assets/sprites/blue_alien.png').convert_alpha()
     def create_alien(self):
         self.rect = self.alien_image.get_rect()
-        self.rect.x = SCREEN_WIDTH/2 -16
-        self.rect.y = SCREEN_HEIGHT/2 -16
+        self.rect.x = SCREEN_WIDTH/2 - 16
+        self.rect.y = SCREEN_HEIGHT/2 - 16
         #self.alien_image.get_rect()
         return self
     def draw_alien(self, aliens_list):
@@ -90,7 +93,7 @@ bg = Background(SCREEN_WIDTH,SCREEN_HEIGHT)
 ship = Ship()
 
 #Sets ship location
-ship.rect.x = SCREEN_WIDTH/2 - 12   # go to x
+ship.rect.x = SCREEN_WIDTH / 2 - 12   # go to x
 ship.rect.y = SCREEN_HEIGHT - 50  # go to y
 player_list = pygame.sprite.Group()
 player_list.add(ship)
@@ -99,9 +102,13 @@ player_list.add(ship)
 pygame.display.flip()
 #keys = pygame.key.get_pressed()
 
+#Create List of Aliens
 alien = Alien()
 aliens = []
 aliens.append(alien.create_alien())
+
+#Create list of rockets
+rockets = []
 
 while True:
     keys = pygame.key.get_pressed()
@@ -110,14 +117,17 @@ while True:
     screen.fill((0,0,0))
     screen.blit(ship.surf,ship.rect)
     alien.draw_alien(aliens)
+    rocket.draw_rockets(rockets)
     pygame.display.flip()
+    for rocket in rockets:
+        if rocket.rect.y < 500 and rocket.rect.y > 0:
+            rocket.shoot()
     for event in pygame.event.get():
         if event.type == pygame.QUIT or (event.type == KEYDOWN and (event.key == K_ESCAPE or event.key == K_q)):
             pygame.quit()
             sys.exit()
         elif event.type == KEYDOWN and event.key == K_SPACE:
-            screen.blit(rocket.surf,rocket.rect)
-            rocket.shoot
+            rockets.append(Rocket(ship.rect.x, ship.rect.y))
     #Press and hold arrow keys allow ship to move calling move functions
     if keys[pygame.K_LEFT]:
         ship.move_left()
