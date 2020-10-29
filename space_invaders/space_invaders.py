@@ -40,9 +40,9 @@ class Ship(pygame.sprite.Sprite):
     def handle_keys(self):
         key = pygame.key.get_pressed()
     def move_left(self):
-        movex -= 5
-    def move_left(self):
-        movex += 5
+        self.rect.x -= 5
+    def move_right(self):
+        self.rect.x += 5
     #Checks if sprite collides with enemies
     def update(self):
         hit_list = pygame.sprite.spritecollide(self, enemy_list, False)
@@ -62,21 +62,25 @@ screen = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))
 bg = Background(SCREEN_WIDTH,SCREEN_HEIGHT)
 ship = Ship()
 
+ship.rect.x = 0   # go to x
+ship.rect.y = 0   # go to y
+player_list = pygame.sprite.Group()
+player_list.add(ship)
+
 #Flips display
 pygame.display.flip()
 pressed_keys = pygame.key.get_pressed()
 
 while True:
     level = 0
-    screen.blit()
+    screen.fill((0,0,0))
     pygame.display.flip()
     for event in pygame.event.get():
         if event.type == pygame.QUIT or (event.type == KEYDOWN and (event.key == K_ESCAPE or event.key == K_q)):
             pygame.quit()
             sys.exit()
-        elif event.type == KEYDOWN and event.key == K_SPACE:
-            player.jump()
-            pygame.mixer.Sound.play(flap_sound)
-            running = False
-        elif event.type == KEYDOWN and event.key != K_SPACE:
-            pygame.mixer.Sound.play(error_sound)
+        elif event.type == KEYDOWN and event.key == K_LEFT:
+            ship.move_left()
+        elif event.type == KEYDOWN and event.key == K_RIGHT:
+            ship.move_right()
+            
