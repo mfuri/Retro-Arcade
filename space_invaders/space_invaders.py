@@ -62,8 +62,8 @@ screen = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))
 bg = Background(SCREEN_WIDTH,SCREEN_HEIGHT)
 ship = Ship()
 
-ship.rect.x = 0   # go to x
-ship.rect.y = 0   # go to y
+ship.rect.x = SCREEN_WIDTH/2 - 12   # go to x
+ship.rect.y = SCREEN_HEIGHT - 50  # go to y
 player_list = pygame.sprite.Group()
 player_list.add(ship)
 
@@ -74,6 +74,7 @@ pressed_keys = pygame.key.get_pressed()
 while True:
     level = 0
     screen.fill((0,0,0))
+    screen.blit(ship.surf,ship.rect)
     pygame.display.flip()
     for event in pygame.event.get():
         if event.type == pygame.QUIT or (event.type == KEYDOWN and (event.key == K_ESCAPE or event.key == K_q)):
