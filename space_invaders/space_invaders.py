@@ -75,8 +75,8 @@ class Alien(pygame.sprite.Sprite):
         self.alien_image = pygame.image.load('assets/sprites/blue_alien.png').convert_alpha()
     def create_alien(self):
         self.rect = self.alien_image.get_rect()
-        self.rect.x = SCREEN_WIDTH/2
-        self.rect.y = SCREEN_HEIGHT/2
+        self.rect.x = SCREEN_WIDTH/2 -16
+        self.rect.y = SCREEN_HEIGHT/2 -16
         #self.alien_image.get_rect()
         return self
     def draw_alien(self, aliens_list):
