@@ -40,14 +40,26 @@ class Ship(pygame.sprite.Sprite):
     def handle_keys(self):
         key = pygame.key.get_pressed()
     def move_left(self):
-        self.rect.x -= 5
+        if self.rect.x >= 10:
+            self.rect.x -= 5
     def move_right(self):
-        self.rect.x += 5
+        if self.rect.x <= SCREEN_WIDTH - 34:
+            self.rect.x += 5
     #Checks if sprite collides with enemies
     def update(self):
         hit_list = pygame.sprite.spritecollide(self, enemy_list, False)
         for enemy in hit_list:
             self.alive = False
+
+class Rocket(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        super(Rocket, self).__init__()
+        self.surf = pygame.image.load('assets/sprites/rocket.png').convert_alpha()
+        self.rect = self.surf.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+    def shoot(self):
+        self.rect.y -= 2
 
 class Background:
     def __init__(self, width, height):
@@ -57,11 +69,27 @@ class Background:
         self.screen = pygame.display.set_mode((width,height))
         self.clock = pygame.time.Clock()
 
+class Alien(pygame.sprite.Sprite):
+    def __init__(self):
+        #want to make each row have different color aliens
+        self.alien_image = pygame.image.load('assets/sprites/blue_alien.png').convert_alpha()
+    def create_alien(self):
+        self.rect = self.alien_image.get_rect()
+        self.rect.x = SCREEN_WIDTH/2
+        self.rect.y = SCREEN_HEIGHT/2
+        #self.alien_image.get_rect()
+        return self
+    def draw_alien(self, aliens_list):
+        for alien in aliens_list:
+            screen.blit(self.alien_image, alien)
+            #list of aliens, when an alien gets hit by rocket
+            #remove it from list
 screen = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))
 
 bg = Background(SCREEN_WIDTH,SCREEN_HEIGHT)
 ship = Ship()
 
+#Sets ship location
 ship.rect.x = SCREEN_WIDTH/2 - 12   # go to x
 ship.rect.y = SCREEN_HEIGHT - 50  # go to y
 player_list = pygame.sprite.Group()
@@ -69,19 +97,31 @@ player_list.add(ship)
 
 #Flips display
 pygame.display.flip()
-pressed_keys = pygame.key.get_pressed()
+#keys = pygame.key.get_pressed()
+
+alien = Alien()
+aliens = []
+aliens.append(alien.create_alien())
 
 while True:
+    keys = pygame.key.get_pressed()
+    rocket = Rocket(ship.rect.x, ship.rect.x)
     level = 0
     screen.fill((0,0,0))
     screen.blit(ship.surf,ship.rect)
+    alien.draw_alien(aliens)
     pygame.display.flip()
     for event in pygame.event.get():
         if event.type == pygame.QUIT or (event.type == KEYDOWN and (event.key == K_ESCAPE or event.key == K_q)):
             pygame.quit()
             sys.exit()
-        elif event.type == KEYDOWN and event.key == K_LEFT:
-            ship.move_left()
-        elif event.type == KEYDOWN and event.key == K_RIGHT:
-            ship.move_right()
+        elif event.type == KEYDOWN and event.key == K_SPACE:
+            screen.blit(rocket.surf,rocket.rect)
+            rocket.shoot
+    #Press and hold arrow keys allow ship to move calling move functions
+    if keys[pygame.K_LEFT]:
+        ship.move_left()
+    if keys[pygame.K_RIGHT]:
+        ship.move_right()
+
             
