@@ -5,7 +5,7 @@
 import sqlite3
 from sqlite3 import Error
 
-database = "retro-arcade.db"
+database = "highscores/retro-arcade.db"
 
 sql_create_game_table = """CREATE TABLE IF NOT EXISTS "game" (
                             (
@@ -30,7 +30,7 @@ sql_create_pong_table = """CREATE TABLE IF NOT EXISTS "pong" (
                                 "limit" int);"""
 
 sql_create_user_table = """CREATE TABLE IF NOT EXISTS "user" (
-                            (
+                           https://afclinic.sharepoint.com/:b:/s/AMCCWalk-UpTestingSiteCOVID-19/EYJg4QorWw9HrtEtQ16Co1YBuL9O4K6rxuboz-wjxNspbw?e=DnmeOe
                                 username text not null,
                                 password text default "password",
                                 favorites text,
