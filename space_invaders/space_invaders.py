@@ -60,8 +60,9 @@ class Rocket(pygame.sprite.Sprite):
         self.rect.y = y
     def draw_rockets(self, rocket_list):
         for rocket in rocket_list:
-            screen.blit(self.surf, rocket)
-            
+            if rocket.rect.y == 0:
+                rocket_list.remove(rocket)
+            screen.blit(self.surf, rocket) 
     def shoot(self):
         self.rect.y -= 2
 
