@@ -7,6 +7,7 @@ import os
 from os import environ
 import sys
 import random
+from decimal import Decimal as D
 environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 
 import pygame
@@ -89,6 +90,19 @@ class Alien(pygame.sprite.Sprite):
             screen.blit(self.alien_image, alien)
             #list of aliens, when an alien gets hit by rocket
             #remove it from list
+    def move_aliens(self, alien_list, value):
+        for alien in alien_list:
+            alien.rect.y += value
+        return alien_list 
+    def rocket_collision(self, alien_list, rocket_list):
+        #checks if alien collides with rocket
+        for alien in alien_list:
+            for rocket in rocket_list:
+                if rocket.rect.colliderect(alien):
+                    alien_list.remove(alien)
+                    rocket_list.remove(rocket)
+                    return True
+        return False
 screen = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))
 
 bg = Background(SCREEN_WIDTH,SCREEN_HEIGHT)
@@ -112,10 +126,17 @@ aliens.append(alien.create_alien())
 #Create list of rockets
 rockets = []
 
-while True:
+MOVEALIENS = pygame.USEREVENT
+#aliens move every 1.5 seconds
+pygame.time.set_timer(MOVEALIENS, 1500)
+
+running = True
+
+while running:
     keys = pygame.key.get_pressed()
     rocket = Rocket(ship.rect.x, ship.rect.x)
     level = 0
+    move_value = 1
     screen.fill((0,0,0))
     screen.blit(ship.surf,ship.rect)
     alien.draw_alien(aliens)
@@ -130,10 +151,13 @@ while True:
             sys.exit()
         elif event.type == KEYDOWN and event.key == K_SPACE:
             rockets.append(Rocket(ship.rect.x+11, ship.rect.y))
+        if event.type == MOVEALIENS:
+           alien.move_aliens(aliens, move_value) 
     #Press and hold arrow keys allow ship to move calling move functions
+    if alien.rocket_collision(aliens,rockets):
+        print("COLLISION!!!!!")
     if keys[pygame.K_LEFT]:
         ship.move_left()
     if keys[pygame.K_RIGHT]:
         ship.move_right()
-
-            
+           
