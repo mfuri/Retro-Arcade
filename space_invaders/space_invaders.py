@@ -3,11 +3,13 @@
 #press space to shoot and arrow keys to move or q to quit
 #contributers: Michael and Mackenzie
 import random
+import copy
 import os
 from os import environ
 import sys
 import random
 from decimal import Decimal as D
+import pickle
 environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 
 import pygame
@@ -17,6 +19,12 @@ SCREEN_WIDTH = 500
 SCREEN_HEIGHT = 500
 
 pygame.init()
+#subject to change
+ALIENS_INITIAL_STATE = [[36, 36], [136, 36], [236, 36], [336, 36], [436, 36],
+                        [36, 86], [136, 86], [236, 86], [336, 86], [436, 86],
+                        [36, 136], [136, 136], [236, 136], [336, 136], [436, 136],
+                        [36, 186], [136, 186], [236, 186], [336, 186], [436, 186],
+                        [36, 236], [136, 236], [236, 236], [336, 236], [436, 236]]
 
 #Imports keyboard controls for Pygame
 from pygame.locals import (
@@ -78,31 +86,71 @@ class Background:
 class Alien(pygame.sprite.Sprite):
     def __init__(self):
         #want to make each row have different color aliens
-        self.alien_image = pygame.image.load('assets/sprites/blue_alien.png').convert_alpha()
-    def create_alien(self):
-        self.rect = self.alien_image.get_rect()
-        self.rect.x = SCREEN_WIDTH/2 - 16
-        self.rect.y = SCREEN_HEIGHT/2 - 16
-        #self.alien_image.get_rect()
+        self.blue_alien_image = pygame.image.load('assets/sprites/blue_alien.png').convert_alpha()
+        self.green_alien_image = pygame.image.load('assets/sprites/green_alien.png').convert_alpha()
+        self.orange_alien_image = pygame.image.load('assets/sprites/orange_alien.png').convert_alpha()
+        self.purple_alien_image = pygame.image.load('assets/sprites/purple_alien.png').convert_alpha()
+        self.color_list = [self.blue_alien_image, self.green_alien_image, self.orange_alien_image, self.purple_alien_image]
+        #self.rect.x = SCREEN_WIDTH/2 - 16
+        #self.rect.y = SCREEN_HEIGHT/2 - 16
+        self.rect = self.blue_alien_image.get_rect()
+        self.level_list = []
+
+    def create_alien(self, alien_list, x, y, alien_color):
+        #need to randomize the board 
+        self.rect.x = x
+        self.rect.y = y
+        self.rect = alien_color.get_rect()
         return self
+        
+    def create_alien_list(self, alien_list):
+        temp_list = self.color_list.copy()
+        alien_color = random.choice(temp_list)
+        j = 0
+
+        for i in range(0, 20):
+            alien = Alien()
+            
+            if (j == 5):
+                alien_color = random.choice(temp_list)
+                j = 0 
+                temp_list.remove(alien_color)
+            j += 1
+            self.level_list.append(alien_color)   
+            alien_list.append(alien_color.get_rect(midbottom = (ALIENS_INITIAL_STATE[i][0],ALIENS_INITIAL_STATE[i][1])))
+
     def draw_alien(self, aliens_list):
+        i = 0
+        #SOMETIMES A LITTLE WONKY BUT WILL DO FURTHER TESTING
         for alien in aliens_list:
-            screen.blit(self.alien_image, alien)
+            screen.blit(self.level_list[i], alien)
+            i += 1
             #list of aliens, when an alien gets hit by rocket
             #remove it from list
     def move_aliens(self, alien_list, value):
         for alien in alien_list:
-            alien.rect.y += value
+            alien.centery += value
         return alien_list 
+
     def rocket_collision(self, alien_list, rocket_list):
         #checks if alien collides with rocket
+        i = 0
+        if (len(alien_list) != 0):
+            for alien in alien_list:
+                for rocket in rocket_list:
+                    if rocket.rect.colliderect(alien):
+                        alien_list.remove(alien)
+                        rocket_list.remove(rocket)
+                        print(i)
+                        self.level_list.remove(self.level_list[i])
+                i += 1
+    def screen_collision(self, alien_list):
         for alien in alien_list:
-            for rocket in rocket_list:
-                if rocket.rect.colliderect(alien):
-                    alien_list.remove(alien)
-                    rocket_list.remove(rocket)
-                    return True
+            if (alien.midbottom[1] >= (SCREEN_HEIGHT - 70)):
+                return True
         return False
+
+
 screen = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))
 
 bg = Background(SCREEN_WIDTH,SCREEN_HEIGHT)
@@ -121,22 +169,24 @@ pygame.display.flip()
 #Create List of Aliens
 alien = Alien()
 aliens = []
-aliens.append(alien.create_alien())
+alien.create_alien_list(aliens)
 
 #Create list of rockets
 rockets = []
 
 MOVEALIENS = pygame.USEREVENT
+time = 1500
 #aliens move every 1.5 seconds
-pygame.time.set_timer(MOVEALIENS, 1500)
+pygame.time.set_timer(MOVEALIENS, time)
 
 running = True
-
+move_value = 1
 while running:
     keys = pygame.key.get_pressed()
     rocket = Rocket(ship.rect.x, ship.rect.x)
+    #as level increases, increase move_value by 1 as well
     level = 0
-    move_value = 1
+   
     screen.fill((0,0,0))
     screen.blit(ship.surf,ship.rect)
     alien.draw_alien(aliens)
@@ -153,9 +203,17 @@ while running:
             rockets.append(Rocket(ship.rect.x+11, ship.rect.y))
         if event.type == MOVEALIENS:
            alien.move_aliens(aliens, move_value) 
+    #check collision
+    alien.rocket_collision(aliens,rockets)
+    if alien.screen_collision(aliens):
+        running = False
+
+    if len(aliens) == 0:
+        print("NEXT LEVEL")
+        level += 1
+        move_value += 4
+        alien.create_alien_list(aliens)
     #Press and hold arrow keys allow ship to move calling move functions
-    if alien.rocket_collision(aliens,rockets):
-        print("COLLISION!!!!!")
     if keys[pygame.K_LEFT]:
         ship.move_left()
     if keys[pygame.K_RIGHT]:
