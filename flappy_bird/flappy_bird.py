@@ -13,10 +13,6 @@ import pygame
 from pygame.locals import *
 import pygame.freetype
 
-pygame.freetype.init()
-
-score_font = pygame.freetype.Font('assets/Corporation_Games.otf', size=0, font_index=0, resolution=0, ucs4=False)
-
 #Imports keyboard controls for Pygame
 from pygame.locals import (
     K_SPACE,
@@ -26,6 +22,9 @@ from pygame.locals import (
 )
 
 pygame.init()
+
+#Grabs font from file
+score_font = pygame.font.Font('assets/Corporation_Games.otf', 42)
 
 #Set resolution to 500x500
 SCREEN_WIDTH = 500
@@ -71,15 +70,6 @@ class Base(pygame.sprite.Sprite):
         self.image = pygame.image.load("assets/sprites/base2.png").convert_alpha()
         self.rect = self.image.get_rect()
         self.rect.center = (SCREEN_WIDTH / 2, 475)
-
-
-#Creates text overlay welcome message
-class Welcome_Overlay(pygame.sprite.Sprite):
-    def __init__(self):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load('assets/sprites/welcome_screen.png').convert_alpha()
-        self.rect = self.image.get_rect()
-        self.rect.center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
 
 class Pipe(pygame.sprite.Sprite):
     def __init__(self):
@@ -130,11 +120,33 @@ clock = pygame.time.Clock()
 # Source: https://opensource.com/article/20/1/add-scorekeeping-your-python-game
 # Function to draw score on screen   
 def stats(score):
-    score_font.render_to(screen, (240, 50), score, (255,255,255), None, size=64)
+    outline = pygame.font.Font('assets/Corporation_Games.otf', 42)
+    text = score_font.render(score, True,  (255,255,255))
+    text_outline = outline.render(score, True,  (0,0,0))
+    text_rect = text.get_rect(center = ((SCREEN_WIDTH / 2), 48))
+    outline_rect = text_outline.get_rect(center = ((SCREEN_WIDTH / 2) + 3, 51))
+    screen.blit(text_outline, outline_rect)
+    screen.blit(text, text_rect)
+
 
 def lose(score):
-    score_font.render_to(screen,(80, 120), "You lose: " + score, (255,255,255), None, size=64)
+    outline = pygame.font.Font('assets/Corporation_Games.otf', 42)
+    text = score_font.render("You lose: " + score + " flaps", True,  (255,255,255))
+    text_outline = outline.render("You lose: " + score + " flaps", True,  (0,0,0))
+    text_rect = text.get_rect(center = ((SCREEN_WIDTH / 2), (SCREEN_HEIGHT / 2)))
+    outline_rect = text_outline.get_rect(center = ((SCREEN_WIDTH / 2) + 3, (SCREEN_HEIGHT / 2)+3))
+    screen.blit(text_outline, outline_rect)
+    screen.blit(text, text_rect)
 
+#Draws welcome message
+def welcome_message():
+    welcome_font = pygame.font.Font('assets/Corporation_Games.otf', 30)
+    welcome_text = welcome_font.render("Press Space to Start", True, (255,255,255))
+    welcome_outline = welcome_font.render("Press Space to Start", True, (0,0,0))
+    welcome_rect = welcome_text.get_rect(center = ((SCREEN_WIDTH / 2), (SCREEN_HEIGHT / 2)-110))
+    outline_rect = welcome_outline.get_rect(center = ((SCREEN_WIDTH/2) + 3,(SCREEN_HEIGHT / 2)-107))
+    screen.blit(welcome_outline, outline_rect)
+    screen.blit(welcome_text, welcome_rect)
 
 
 #game running variable
@@ -142,7 +154,6 @@ running = True
 
 #instantiates background image object
 bg = Background()
-welcome = Welcome_Overlay()
 
 #Instantiate enemies
 base = Base()
@@ -201,7 +212,8 @@ while flappy:
         screen.blit(base.image, base.rect)
         #pipe.draw(screen)
         #Welcome image
-        screen.blit(welcome.image,welcome.rect)
+        welcome_message()
+        #screen.blit(welcome.image,welcome.rect)
         pygame.display.flip()
 
     running = True
@@ -229,13 +241,11 @@ while flappy:
         #pipe.check_collision(pipes, player)
         if pipe.check_collision(pipes, player):
             pygame.mixer.Sound.play(death_sound)
-            print("You lose")
             lose(str(points))
             running = False
 
         if player.alive == False:
             pygame.mixer.Sound.play(death_sound)
-            print("You lose")
             lose(str(points))
             running = False
         #loads background image into game
@@ -273,7 +283,6 @@ while flappy:
         screen.fill([255, 255, 255])
         screen.blit(bg.image, bg.rect)
         screen.blit(base.image,base.rect)
-        stats(str(points))
         lose(str(points))
         pygame.display.flip()
         pipes = []
