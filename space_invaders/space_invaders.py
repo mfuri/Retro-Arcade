@@ -60,6 +60,7 @@ class Ship(pygame.sprite.Sprite):
         for enemy in hit_list:
             self.alive = False
 
+#Code inspiration: https://www.techwithtim.net/tutorials/game-development-with-python/pygame-tutorial/projectiles/
 class Rocket(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super(Rocket, self).__init__()
@@ -71,7 +72,7 @@ class Rocket(pygame.sprite.Sprite):
         for rocket in rocket_list:
             if rocket.rect.y == 0:
                 rocket_list.remove(rocket)
-            screen.blit(self.surf, rocket) 
+            screen.blit(self.surf, rocket)
     def shoot(self):
         self.rect.y -= 2
 
