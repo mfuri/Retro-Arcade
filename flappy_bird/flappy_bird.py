@@ -130,9 +130,12 @@ def stats(score):
 
 
 def lose(score):
-    outline = pygame.font.Font('assets/Corporation_Games.otf', 42)
-    text = score_font.render("You lose: " + score + " flaps", True,  (255,255,255))
-    text_outline = outline.render("You lose: " + score + " flaps", True,  (0,0,0))
+    outline = pygame.font.Font('assets/KarmaFuture.ttf', 42)
+    flap = " flaps"
+    if (int(score) == 1):
+        flap = " flap"
+    text = outline.render("You lose: " + score + flap, True,  (255,255,255))
+    text_outline = outline.render("You lose: " + score + flap, True,  (0,0,0))
     text_rect = text.get_rect(center = ((SCREEN_WIDTH / 2), (SCREEN_HEIGHT / 2)))
     outline_rect = text_outline.get_rect(center = ((SCREEN_WIDTH / 2) + 3, (SCREEN_HEIGHT / 2)+3))
     screen.blit(text_outline, outline_rect)
@@ -140,11 +143,11 @@ def lose(score):
 
 #Draws welcome message
 def welcome_message():
-    welcome_font = pygame.font.Font('assets/Corporation_Games.otf', 30)
-    welcome_text = welcome_font.render("Press Space to Start", True, (255,255,255))
-    welcome_outline = welcome_font.render("Press Space to Start", True, (0,0,0))
+    welcome_font = pygame.font.Font('assets/KarmaFuture.ttf', 24)
+    welcome_text = welcome_font.render("Press Space to Start (Q or ESC to Quit)", True, (255,255,255))
+    welcome_outline = welcome_font.render("Press Space to Start (Q or ESC to Quit)", True, (0,0,0))
     welcome_rect = welcome_text.get_rect(center = ((SCREEN_WIDTH / 2), (SCREEN_HEIGHT / 2)-110))
-    outline_rect = welcome_outline.get_rect(center = ((SCREEN_WIDTH/2) + 3,(SCREEN_HEIGHT / 2)-107))
+    outline_rect = welcome_outline.get_rect(center = ((SCREEN_WIDTH/2) + 2,(SCREEN_HEIGHT / 2)-108))
     screen.blit(welcome_outline, outline_rect)
     screen.blit(welcome_text, welcome_rect)
 
