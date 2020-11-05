@@ -1,1145 +1,184 @@
-$sideColor: rgb(41,37,87);
-$panelColor: rgb(68,62,145);
-$backsideColor: rgb(96,91,88);
-
-$invader1Color: rgb(255,28,28);
-$invader2Color: rgb(255,255,28);
-$invader3Color: rgb(28,255,28);
-$backColor: transparent;
-
-$arcadeX: 380px;
-$arcadeY: 320px;
-$arcadeZ: 800px;
-$capX: 380px;
-$capY: 360px;
-$capZ: 140px;
-$capOverhang: ($capY - $arcadeY);
-$panelX: 380px;
-$panelY: 120px;
-$panelZ: 400px;
-$screenZ: 360px;
-
-
-html {
-    height: 100%;
-    margin-bottom: 1px;
-}
-body {
-	background: #909090;
-	padding: 10px;
-}
-h1 {
-	margin: 16px 0;
-	text-align: center;
-	text-shadow: 0 0 3px rgba(0,0,0,0.4);
-	font-size: 36px;
-	font-family: 'Fredoka One', cursive;
-}
-h1>span {
-    display: block;
-	font-size: 12px;
-    font-family: Arial;
-	color: #222;
-}
-h2 {
-	margin: 8px 0;
-	text-align: center;
-	text-shadow: 0 0 4px rgba(255,255,255,0.7);
-	font-size: 22px;
-	font-family: 'Fredoka One', cursive;
-}
-a {
-	color: #89310F;
-}
-.infobox {
-	float: right;
-	widrh: 20%;
-	padding: 1em;
-	background-color: #eee;
-	border: 1px solid #888;
-	box-shadow: 3px 3px 3px 0 rgba(0,0,0,.5);
-
+body{
+	background-color:#3d3d3d;
 }
 
-/* Arcade Machine */
-.stage {
-	perspective: 1600px;
-	perspective-origin: 50% 50%;
-	transform-origin: 100% 100%;
-	margin: 80px 0 100px 100px;
-	transition: transform 1s;
-}
-
-/* Zoom */
-.arcademachinewrap {
-	position: relative;
-	width: $arcadeX;
-	transform-style: preserve-3d;
-	transform: scale(.5);
-	transition: all 1s;
-}
-.arcademachinewrap:hover {
-	transform: scale(1);
-}
-/* Rotate */
-.arcademachinewrap .arcademachine {
-	position: relative;
-	width: $arcadeX;
-	transform-style: preserve-3d;
-	animation: spin 6s linear infinite;
-    animation-play-state: running;
- 	transition: all 1.5s;
-    transform: rotateY(89deg);
-}
-.arcademachinewrap:hover .arcademachine {
-	transform: rotateY(0deg);
-    animation: none;
-}
-@keyframes spin {
-	from { transform: rotateY(0); }
-	to { transform: rotateY(360deg); }
-}
-.box {
-	position: relative;
-	width: $arcadeX;
-	transform-style: preserve-3d;
-}
-.side {
-	backface-visibility: hidden;
-}
-
-/* Cap */
-.cap  {
-z-index: -1;
-	xdisplay: none;
-	transform-style: preserve-3d;
-	transform-origin: bottom left;
-	transform-origin: center center center;
-	transform: rotateY(90deg) skewY(13deg) rotateY(-90deg) translateY(-$capZ/2 + 33px) translateZ($capOverhang/2); /*  translateY(-$capZ/2 + 33px) */
-}
-.capright, .capleft {
-	backface-visibility: hidden;
+.machine{
+	width:140px;
+	padding-top:40px;
+	/*Not needed, CSS only if you want to center vertically and horizontally*/
 	position: absolute;
-	width: $capY;
-	height: $capZ;
-	background-color: $sideColor;
-}
-.capfront, .capback {
-	backface-visibility: hidden;
-	position: absolute;
-	width: $capX;
-	height: $capZ;
-	background-color: $sideColor;
-}
-.captop, .capbottom {
-	backface-visibility: hidden;
-	position: absolute;
-	width: $capX;
-	height: $capY;
-	background-color: $sideColor;
-}
-.capright {
-	box-shadow: 0 0 0 1px rgba(0,0,0,.4) inset;
-	transform-origin: top right;
-	transform: rotateY(-270deg) translateX(($capY / 2)) translateZ($capOverhang/2);
-}
-.capleft {
-	box-shadow: 0 0 0 1px rgba(0,0,0,.4) inset;
-	transform-origin: top left;
-	transform: rotateY(270deg) translateX(-($capY / 2));
-}
-.capfront {
-	box-shadow: 0 0 0 1px rgba(0,0,0,.3) inset;
-	text-align: center;
-	transform-origin: bottom center;
-	transform: translateZ(($capY / 2));
-}
-.capback {
-	transform-origin: bottom center;
-	transform: translateZ(-($capY / 2)) rotateY(180deg);
-	background-color: $backsideColor;
-}
-.captop {
-	background-image: radial-gradient(ellipse at top, rgba(31,28,66,1) 0%, rgba(31,28,66,0) 100%);
-	box-shadow: 0 0 0 1px rgba(0,0,0,.7) inset;
-	transform-origin: top left;
-	transform: rotateX(90deg) translateY(-($capY / 2));
-}
-.capbottom {
-	background-image: radial-gradient(ellipse at top, rgba(31,28,66,1) 0%, rgba(31,28,66,0) 100%);
-	box-shadow: 0 0 0 1px rgba(0,0,0,.3) inset;
-	transform: rotateX(270deg) translateY(-($capY / 2)) translateZ($capZ);
-	transform-origin: top left;
-	background-color: $sideColor;
-    height: 70px; /* 70px */
-}
-/* Panel */
-.panel  {
-z-index: -1;
-	transform-style: preserve-3d;
-	transform-origin: top center;
-	transform: rotateX(-12deg) translateY(($panelZ - $arcadeY/2 +110px)) translateZ(260px); /* translateY(($panelZ - $arcadeY/2 +55px)) translateZ(130px) */
-}
-.panelright, .panelleft {
-	backface-visibility: hidden;
-	position: absolute;
-	width: $panelY;
-	height: $panelZ;
-	background-color: $sideColor;
-}
-.panelfront, .panelback {
-	backface-visibility: hidden;
-	position: absolute;
-	width: $panelX;
-	height: $panelZ;
-	background-color: $sideColor;
-}
-.paneltop, .panelbottom {
-	backface-visibility: hidden;
-	position: absolute;
-	width: $panelX;
-	height: $panelY;
-	background-color: $sideColor;
-}
-.panelright {
-	box-shadow: 0 0 1px 1px rgba(0,0,0,.3) inset;
-	transform-origin: top right;
-	transform: rotateY(-270deg) translateX(($panelY / 2)) translateZ(($panelX - $panelY));
-}
-.panelleft {
-	box-shadow: 0 0 1px 1px rgba(0,0,0,.3) inset;
-	transform-origin: top left;
-	transform: rotateY(270deg) translateX(-($panelY / 2));
-}
-.panelfront {
-	box-shadow: 0 0 1px 1px rgba(0,0,0,.3) inset;
-	background-image: radial-gradient(ellipse at bottom, rgba(0,0,0,.3) 0%, rgba(0,0,0,0) 100%);
-	text-align: center;
-	transform-origin: center center;
-	transform: translateZ(($panelY / 2));
-}
-.panelback {
-	/* Screen */
-    height: $screenZ - 20px;
-	transform-origin: bottom center;
-	transform: translateY(-($panelX - ($panelZ - $screenZ + 15px))) translateZ(-($panelY/2)) rotateX(32deg);
-	background-color: $backsideColor;
-	background-image: radial-gradient(ellipse at center, rgba(128,142,162,1) 0%,rgba(128,142,162,1) 50%,rgba(71,92,105,1) 100%),linear-gradient(to bottom, rgba(0,0,0,0.35) 0%,rgba(0,0,0,0) 100%);
-	box-shadow: 0 0 0 1px rgba(0,0,0,.3) inset;
-}
-.paneltop {
-	box-shadow: 0 0 0 1px rgba(0,0,0,.7) inset;
-	transform-origin: top left;
-	transform: rotateX(90deg) translateY(-($panelY / 2));
-	background-color: $panelColor;
-    background-image: linear-gradient(to bottom, rgba(0,0,0,.5) 0%,rgba(0,0,0,0) 100%);
-}
-.panelbottom {
-	transform: rotateX(270deg) translateY(-($panelY / 2)) translateZ($panelZ);
-	transform-origin: top left;
-	background-color: $sideColor;
+	top: 50%; left: 50%;
+	transform: translate(-50%,-50%);
+	animation:shake .4s infinite;
+	/*Not needed, CSS only if you want to center vertically and horizontally*/
 }
 
-
-/* Main */
-.main {
-	xdisplay: none;
-    z-index: 1;
-}
-.main .invader1 {
-    animation: none !important;
-}
-
-.mainright, .mainleft {
-	backface-visibility: hidden;
-	position: absolute;
-	width: $arcadeY;
-	height: $arcadeZ;
-	background-color: $sideColor;
-	text-align: center;
-}
-.mainright h3 {
-	margin-top: 60px;
-	transform:  perspective(100px) rotateX(-29deg) rotateZ(7deg);
-}
-.mainleft h3 {
-	margin-top: 60px;
-	transform:  perspective(100px) rotateX(-29deg) rotateZ(-7deg);
-}
-.mainback {
-	position: absolute;
-	width: $arcadeX;
-	height: $arcadeZ;
-	background-color: $backsideColor;
-	background-image: radial-gradient(ellipse at bottom, rgba(0,0,0,.3) 0%, rgba(0,0,0,0) 100%);
-	box-shadow: 0 0 0 1px rgba(0,0,0,.3) inset;
-}
-.mainbottom {
-	position: absolute;
-	width: $arcadeX;
-	height: $arcadeY;
-	background-color: $sideColor;
-}
-.mainright {
-	background-image: linear-gradient(290deg, rgba(20,18,43,1) 0%, rgba(20,18,43,0) 51%, rgba(20,18,43,0) 100%);
-	transform-origin: top right;
-	transform: rotateY(-270deg) translateX(($arcadeY / 2)) translateZ(60px); /*  translateZ(30px) */
-}
-.mainleft {
-	background-image: linear-gradient(70deg, rgba(20,18,43,1) 0%, rgba(20,18,43,0) 51%, rgba(20,18,43,0) 100%);
-	transform-origin: top left;
-	transform: rotateY(270deg) translateX(-($arcadeY / 2));
-}
-.mainright.inner {
-	transform: rotateY(-90deg) translateX(($arcadeY / 2)) translateZ(-60px);  /*  translateZ(-30px) */
-}
-.mainleft.inner {
-	transform: rotateY(90deg) translateX(-($arcadeY / 2));
-}
-.mainback {
-	transform-origin: bottom center;
-	transform: translateZ(-($arcadeY / 2)) rotateY(180deg);
-}
-.mainbottom {
-	transform: rotateX(270deg) translateY(-($arcadeY / 2)) translateZ($arcadeZ);
-	transform-origin: top left;
-	background-color: $sideColor;
-	box-shadow: 0 0 $arcadeY/2 $arcadeX/2 rgba(0,0,0,.7);
-}
-
-
-/* Space Invaders */
-.invader1, .invader2, .invader3 {
-	font-size: 8px;
-	width: 16em;
-	height: 30em;
-	background-repeat: repeat-x;
-	background-size: 16em 1em;
-	background-position: 0 3em,
-						 0 4em,
-						 0 5em,
-						 0 6em,
-						 0 7em,
-						 0 8em,
-						 0 9em,
-						 0 10em,
-						 0 19em,
-						 0 20em,
-						 0 21em,
-						 0 22em,
-						 0 23em,
-						 0 24em,
-						 0 25em,
-						 0 26em;
-	animation: animate-invaders 2s steps(1) infinite;
-}
-.invader1 {
-	background-image: linear-gradient(to left,
-						$backColor 0,
-						$backColor 6em,
-						$invader1Color 6em,
-						$invader1Color 10em,
-						$backColor 10em,
-						$backColor 15em
-					 ),linear-gradient(to left,
-						$backColor 0,
-						$backColor 3em,
-						$invader1Color 3em,
-						$invader1Color 13em,
-						$backColor 13em,
-						$backColor 15em
-					 ),linear-gradient(to left,
-						$backColor 0,
-						$backColor 2em,
-						$invader1Color 2em,
-						$invader1Color 14em,
-						$backColor 14em,
-						$backColor 15em
-					 ),linear-gradient(to left,
-						$backColor 0,
-						$backColor 2em,
-						$invader1Color 2em,
-						$invader1Color 5em,
-						$backColor 5em,
-						$backColor 7em,
-						$invader1Color 7em,
-						$invader1Color 9em,
-						$backColor 9em,
-						$backColor 11em,
-						$invader1Color 11em,
-						$invader1Color 14em,
-						$backColor 14em,
-						$backColor 15em
-					 ),linear-gradient(to left,
-						$backColor 0,
-						$backColor 2em,
-						$invader1Color 2em,
-						$invader1Color 14em,
-						$backColor 14em,
-						$backColor 15em
-					 ),linear-gradient(to left,
-						$backColor 0,
-						$backColor 5em,
-						$invader1Color 5em,
-						$invader1Color 7em,
-						$backColor 7em,
-						$backColor 9em,
-						$invader1Color 9em,
-						$invader1Color 11em,
-						$backColor 11em,
-						$backColor 15em
-					 ),linear-gradient(to left,
-						$backColor 0,
-						$backColor 4em,
-						$invader1Color 4em,
-						$invader1Color 6em,
-						$backColor 6em,
-						$backColor 7em,
-						$invader1Color 7em,
-						$invader1Color 9em,
-						$backColor 9em,
-						$backColor 10em,
-						$invader1Color 10em,
-						$invader1Color 12em,
-						$backColor 12em,
-						$backColor 15em
-					 ),linear-gradient(to left,
-						$backColor 0,
-						$backColor 3em,
-						$invader1Color 3em,
-						$invader1Color 5em,
-						$backColor 5em,
-						$backColor 11em,
-						$invader1Color 11em,
-						$invader1Color 13em,
-						$backColor 13em,
-						$backColor 15em
-					 ),linear-gradient(to left,
-						$backColor 0,
-						$backColor 6em,
-						$invader1Color 6em,
-						$invader1Color 10em,
-						$backColor 10em,
-						$backColor 15em
-					 ),linear-gradient(to left,
-						$backColor 0,
-						$backColor 3em,
-						$invader1Color 3em,
-						$invader1Color 13em,
-						$backColor 13em,
-						$backColor 15em
-					 ),linear-gradient(to left,
-						$backColor 0,
-						$backColor 2em,
-						$invader1Color 2em,
-						$invader1Color 14em,
-						$backColor 14em,
-						$backColor 15em
-					 ),linear-gradient(to left,
-						$backColor 0,
-						$backColor 2em,
-						$invader1Color 2em,
-						$invader1Color 5em,
-						$backColor 5em,
-						$backColor 7em,
-						$invader1Color 7em,
-						$invader1Color 9em,
-						$backColor 9em,
-						$backColor 11em,
-						$invader1Color 11em,
-						$invader1Color 14em,
-						$backColor 14em,
-						$backColor 15em
-					 ),linear-gradient(to left,
-						$backColor 0,
-						$backColor 2em,
-						$invader1Color 2em,
-						$invader1Color 14em,
-						$backColor 14em,
-						$backColor 15em
-					 ),linear-gradient(to left,
-						$backColor 0,
-						$backColor 4em,
-						$invader1Color 4em,
-						$invader1Color 7em,
-						$backColor 7em,
-						$backColor 9em,
-						$invader1Color 9em,
-						$invader1Color 12em,
-						$backColor 12em,
-						$backColor 15em
-					 ),linear-gradient(to left,
-						$backColor 0,
-						$backColor 3em,
-						$invader1Color 3em,
-						$invader1Color 5em,
-						$backColor 5em,
-						$backColor 7em,
-						$invader1Color 7em,
-						$invader1Color 9em,
-						$backColor 9em,
-						$backColor 11em,
-						$invader1Color 11em,
-						$invader1Color 13em,
-						$backColor 13em,
-						$backColor 15em
-					 ),linear-gradient(to left,
-						$backColor 0,
-						$backColor 4em,
-						$invader1Color 4em,
-						$invader1Color 6em,
-						$backColor 6em,
-						$backColor 10em,
-						$invader1Color 10em,
-						$invader1Color 12em,
-						$backColor 12em,
-						$backColor 15em
-					 );
-}
-.invader2 {
-	background-image: linear-gradient(to left,
-						$backColor 0,
-						$backColor 5em,
-						$invader2Color 5em,
-						$invader2Color 6em,
-						$backColor 6em,
-						$backColor 11em,
-						$invader2Color 11em,
-						$invader2Color 12em,
-						$backColor 12em,
-						$backColor 15em
-					 ),linear-gradient(to left,
-						$backColor 0,
-						$backColor 3em,
-						$invader2Color 3em,
-						$invader2Color 4em,
-						$backColor 4em,
-						$backColor 6em,
-						$invader2Color 6em,
-						$invader2Color 7em,
-						$backColor 7em,
-						$backColor 10em,
-						$invader2Color 10em,
-						$invader2Color 11em,
-						$backColor 11em,
-						$backColor 13em,
-						$invader2Color 13em,
-						$invader2Color 14em,
-						$backColor 14em,
-						$backColor 15em
-					 ),linear-gradient(to left,
-						$backColor 0,
-						$backColor 3em,
-						$invader2Color 3em,
-						$invader2Color 4em,
-						$backColor 4em,
-						$backColor 5em,
-						$invader2Color 5em,
-						$invader2Color 12em,
-						$backColor 12em,
-						$backColor 13em,
-						$invader2Color 13em,
-						$invader2Color 14em,
-						$backColor 14em,
-						$backColor 15em
-					 ),linear-gradient(to left,
-						$backColor 0,
-						$backColor 3em,
-						$invader2Color 3em,
-						$invader2Color 6em,
-						$backColor 6em,
-						$backColor 7em,
-						$invader2Color 7em,
-						$invader2Color 10em,
-						$backColor 10em,
-						$backColor 11em,
-						$invader2Color 11em,
-						$invader2Color 14em,
-						$backColor 14em,
-						$backColor 15em
-					 ),linear-gradient(to left,
-						$backColor 0,
-						$backColor 3em,
-						$invader2Color 3em,
-						$invader2Color 14em,
-						$backColor 14em,
-						$backColor 15em
-					 ),linear-gradient(to left,
-						$backColor 0,
-						$backColor 4em,
-						$invader2Color 4em,
-						$invader2Color 13em,
-						$backColor 13em,
-						$backColor 15em
-					 ),linear-gradient(to left,
-						$backColor 0,
-						$backColor 5em,
-						$invader2Color 5em,
-						$invader2Color 6em,
-						$backColor 6em,
-						$backColor 11em,
-						$invader2Color 11em,
-						$invader2Color 12em,
-						$backColor 12em,
-						$backColor 15em
-					 ),linear-gradient(to left,
-						$backColor 0,
-						$backColor 4em,
-						$invader2Color 4em,
-						$invader2Color 5em,
-						$backColor 5em,
-						$backColor 12em,
-						$invader2Color 12em,
-						$invader2Color 13em,
-						$backColor 13em,
-						$backColor 15em
-					 ),linear-gradient(to left,
-						$backColor 0,
-						$backColor 5em,
-						$invader2Color 5em,
-						$invader2Color 6em,
-						$backColor 6em,
-						$backColor 11em,
-						$invader2Color 11em,
-						$invader2Color 12em,
-						$backColor 12em,
-						$backColor 15em
-					 ),linear-gradient(to left,
-						$backColor 0,
-						$backColor 6em,
-						$invader2Color 6em,
-						$invader2Color 7em,
-						$backColor 7em,
-						$backColor 10em,
-						$invader2Color 10em,
-						$invader2Color 11em,
-						$backColor 11em,
-						$backColor 15em
-					 ),linear-gradient(to left,
-						$backColor 0,
-						$backColor 5em,
-						$invader2Color 5em,
-						$invader2Color 12em,
-						$backColor 12em,
-						$backColor 15em
-					 ),linear-gradient(to left,
-						$backColor 0,
-						$backColor 4em,
-						$invader2Color 4em,
-						$invader2Color 6em,
-						$backColor 6em,
-						$backColor 7em,
-						$invader2Color 7em,
-						$invader2Color 10em,
-						$backColor 10em,
-						$backColor 11em,
-						$invader2Color 11em,
-						$invader2Color 13em,
-						$backColor 13em,
-						$backColor 15em
-					 ),linear-gradient(to left,
-						$backColor 0,
-						$backColor 3em,
-						$invader2Color 3em,
-						$invader2Color 14em,
-						$backColor 14em,
-						$backColor 15em
-					 ),linear-gradient(to left,
-						$backColor 0,
-						$backColor 3em,
-						$invader2Color 3em,
-						$invader2Color 4em,
-						$backColor 4em,
-						$backColor 5em,
-						$invader2Color 5em,
-						$invader2Color 12em,
-						$backColor 12em,
-						$backColor 13em,
-						$invader2Color 13em,
-						$invader2Color 14em,
-						$backColor 14em,
-						$backColor 15em
-					 ),linear-gradient(to left,
-						$backColor 0,
-						$backColor 3em,
-						$invader2Color 3em,
-						$invader2Color 4em,
-						$backColor 4em,
-						$backColor 5em,
-						$invader2Color 5em,
-						$invader2Color 6em,
-						$backColor 6em,
-						$backColor 11em,
-						$invader2Color 11em,
-						$invader2Color 12em,
-						$backColor 12em,
-						$backColor 13em,
-						$invader2Color 13em,
-						$invader2Color 14em,
-						$backColor 14em,
-						$backColor 15em
-					 ),linear-gradient(to left,
-						$backColor 0,
-						$backColor 6em,
-						$invader2Color 6em,
-						$invader2Color 8em,
-						$backColor 8em,
-						$backColor 9em,
-						$invader2Color 9em,
-						$invader2Color 11em,
-						$backColor 11em,
-						$backColor 15em
-					 );
-}
-.invader3 {
-	background-image: linear-gradient(to left,
-						$backColor 0,
-						$backColor 7em,
-						$invader3Color 7em,
-						$invader3Color 9em,
-						$backColor 9em,
-						$backColor 15em
-					 ),linear-gradient(to left,
-						$backColor 0,
-						$backColor 6em,
-						$invader3Color 6em,
-						$invader3Color 10em,
-						$backColor 10em,
-						$backColor 15em
-					 ),linear-gradient(to left,
-						$backColor 0,
-						$backColor 5em,
-						$invader3Color 5em,
-						$invader3Color 11em,
-						$backColor 11em,
-						$backColor 15em
-					 ),linear-gradient(to left,
-						$backColor 0,
-						$backColor 4em,
-						$invader3Color 4em,
-						$invader3Color 6em,
-						$backColor 6em,
-						$backColor 7em,
-						$invader3Color 7em,
-						$invader3Color 9em,
-						$backColor 9em,
-						$backColor 10em,
-						$invader3Color 10em,
-						$invader3Color 12em,
-						$backColor 12em,
-						$backColor 15em
-					 ),linear-gradient(to left,
-						$backColor 0,
-						$backColor 4em,
-						$invader3Color 4em,
-						$invader3Color 12em,
-						$backColor 12em,
-						$backColor 15em
-					 ),linear-gradient(to left,
-						$backColor 0,
-						$backColor 6em,
-						$invader3Color 6em,
-						$invader3Color 7em,
-						$backColor 7em,
-						$backColor 9em,
-						$invader3Color 9em,
-						$invader3Color 10em,
-						$backColor 10em,
-						$backColor 15em
-					 ),linear-gradient(to left,
-						$backColor 0,
-						$backColor 5em,
-						$invader3Color 5em,
-						$invader3Color 6em,
-						$backColor 6em,
-						$backColor 7em,
-						$invader3Color 7em,
-						$invader3Color 9em,
-						$backColor 9em,
-						$backColor 10em,
-						$invader3Color 10em,
-						$invader3Color 11em,
-						$backColor 11em,
-						$backColor 15em
-					 ),linear-gradient(to left,
-						$backColor 0,
-						$backColor 4em,
-						$invader3Color 4em,
-						$invader3Color 5em,
-						$backColor 5em,
-						$backColor 6em,
-						$invader3Color 6em,
-						$invader3Color 7em,
-						$backColor 7em,
-						$backColor 9em,
-						$invader3Color 9em,
-						$invader3Color 10em,
-						$backColor 10em,
-						$backColor 11em,
-						$invader3Color 11em,
-						$invader3Color 12em,
- 						$backColor 12em,
-						$backColor 15em
-					 ),linear-gradient(to left,
-						$backColor 0,
-						$backColor 7em,
-						$invader3Color 7em,
-						$invader3Color 9em,
-						$backColor 9em,
-						$backColor 15em
-					 ),linear-gradient(to left,
-						$backColor 0,
-						$backColor 6em,
-						$invader3Color 6em,
-						$invader3Color 10em,
-						$backColor 10em,
-						$backColor 15em
-					 ),linear-gradient(to left,
-						$backColor 0,
-						$backColor 5em,
-						$invader3Color 5em,
-						$invader3Color 11em,
-						$backColor 11em,
-						$backColor 15em
-					 ),linear-gradient(to left,
-						$backColor 0,
-						$backColor 4em,
-						$invader3Color 4em,
-						$invader3Color 6em,
-						$backColor 6em,
-						$backColor 7em,
-						$invader3Color 7em,
-						$invader3Color 9em,
-						$backColor 9em,
-						$backColor 10em,
-						$invader3Color 10em,
-						$invader3Color 12em,
-						$backColor 12em,
-						$backColor 15em
-					 ),linear-gradient(to left,
-						$backColor 0,
-						$backColor 4em,
-						$invader3Color 4em,
-						$invader3Color 12em,
-						$backColor 12em,
-						$backColor 15em
-					 ),linear-gradient(to left,
-						$backColor 0,
-						$backColor 5em,
-						$invader3Color 5em,
-						$invader3Color 6em,
-						$backColor 6em,
-						$backColor 7em,
-						$invader3Color 7em,
-						$invader3Color 9em,
-						$backColor 9em,
-						$backColor 10em,
-						$invader3Color 10em,
-						$invader3Color 11em,
-						$backColor 11em,
-						$backColor 15em
-					 ),linear-gradient(to left,
-						$backColor 0,
-						$backColor 4em,
-						$invader3Color 4em,
-						$invader3Color 5em,
-						$backColor 5em,
-						$backColor 11em,
-						$invader3Color 11em,
-						$invader3Color 12em,
-						$backColor 12em,
-						$backColor 15em
-					 ),linear-gradient(to left,
-						$backColor 0,
-						$backColor 5em,
-						$invader3Color 5em,
-						$invader3Color 6em,
-						$backColor 6em,
-						$backColor 10em,
-						$invader3Color 10em,
-						$invader3Color 11em,
-						$backColor 11em,
-						$backColor 15em
-					 );
-}
-@keyframes animate-invaders {
-    50% {
-    	background-position: 0 19em,
-    						 0 20em,
-    						 0 21em,
-    						 0 22em,
-    						 0 23em,
-    						 0 24em,
-    						 0 25em,
-    						 0 26em,
-                             0 3em,
-    						 0 4em,
-    						 0 5em,
-    						 0 6em,
-    						 0 7em,
-    						 0 8em,
-    						 0 9em,
-    						 0 10em;
-	}
-}
-.invader1.small, .invader2.small, .invader3.small {
-	font-size: 4px;
-	height: 15em;
-	display: inline-block;
-	opacity: .8;
-	position: relative;
-	top: -10em;
-    animation: none;
-}
-.invader1.big, .invader2.big, .invader3.big {
-	font-size: 10px;
-	height: 15em;
-	display: block;
-	opacity: .8;
-	position: relative;
-    left: 20px;
-    animation: none;
-}
-.invader1.big {
-    left: 20px;
-}
-.invader2.big {
-    left: 80px;
-}
-.invader3.big {
-    left: 20px;
-}
-.row {
-	width: 144em;
-	height: 15em;
-}
-.row.double {
-  height: 30em;
-}
-
-.space-invaders {
-  position: absolute;
-  transform-origin: left top;
-  transform: scale(.2);
-  z-index: 1;
-  top:0;
-  left:0;
-  top: 20px;
-  left: 15px;
-  animation: showinvaders 10s steps(1) infinite;
-}
-@keyframes showinvaders {
-	0% { opacity:0; }
-	20% { opacity:1; }
-	90% { opacity:1; }
-	100% { opacity:0; }
-}
-.gameover {
-  text-align: center;
-  font: bold 35px/160px Arial;
-  color: rgb(255,28,28);
-  z-index: 1;
-  animation: showgameover 10s steps(1) infinite;
-}
-@keyframes showgameover {
-	0% { opacity:1; }
-	20% { opacity:0; }
-	90% { opacity:0; }
-	100% { opacity:1; }
-}
-.space-invaders-move {
-    position: absolute;
-    z-index: 1;
-    top:0;
-    left:0;
-    top: 20px;
-    left: 10px;
-    width: 300px;
-    animation: moveinvaders 16s steps(16) infinite;
-}
-@keyframes moveinvaders {
-	0% { left:0; }
-	50% { left: 3em; }
-	100% {  left: 0; }
-}
-
-.insertcoin {
-  padding-top: 20px;
-  text-align: center;
-  font: bold 26px/30px Arial;
-  color: rgb(255,255,255);
-  z-index: 1;
-  opacity: 0;
-  animation: flash 2s steps(1) infinite;
-}
-@keyframes flash {
-	0% { opacity:0; }
-	50% {  opacity: 1; }
-	100% {  opacity: 1; }
-}
-
-
-.logo {
-	display: inline-block;
-	padding-top: 130px;
-	text-align: center;
-	color: #F0D73F;
-	font: bold 38px/40px Arial;
-	transform-origin: 50% 100%;
-	transform:  perspective(100px) rotateX(-25deg);
-    backface-visibility: hidden;
-	text-shadow: -1px -1px 1px rgba(0,0,0,1),
-				 1px 1px 1px rgba(0,0,0,1),
-				 0 -3px 1px rgba(255,0,0,1),
-				 0 -5px 1px rgba(0,0,0,1);
-}
-.cap .logo {
-  padding-top: 45px;
-}
-.mainleft .logo {
-	transform:  perspective(100px) rotateX(-25deg) rotate(353deg);
-}
-.mainright .logo {
-	transform:  perspective(100px) rotateX(-25deg) rotate(7deg);
-}
-
-.button {
-	margin-top: 2px;
-	position: relative;
-	display: inline-block;
-	width: 20px;
-	height: 20px;
-	border-radius: 50%;
-	background-color: rgba(230,0,0,1);
-}
-.button.players1:before, .button.players2:before,
-.button.fire:before,
-.button.left:before, .button.right:before {
-	position: absolute;
-	white-space: pre;
-	content: "1 Player ";
-	font: bold 10px/20px Arial;
-	color: #eee;
-	right: 24px;
-}
-.button.players2:before {
-	content: "2 Player";
-}
-.button.fire:before, .button.left:before, .button.right:before{
-	content: "Fire";
-	right: auto;
-	left: 0px;
-	bottom: -20px;
-}
-.button.left:before{
-	content: "Left";
-}
-.button.right:before{
-	content: "Right";
-}
-.button:after {
-	content:"";
-	position: absolute;
-	left: 4px;
-	top: 4px;
-	width: 12px;
-	height: 12px;
-	border-radius: 50%;
-	background-color: rgba(230,0,0,1);
-    background-image: radial-gradient(ellipse at center, rgba(0,0,0,0.35) 0%,rgba(0,0,0,0) 100%);
-}
-.coinslot {
-	position: relative;
-	float: right;
-	width: 100px;
-	height: 60px;
-	border-radius: 3px;
-	background: #aaa;
-	margin: 20px;
-	border: 2px solid #888;
-}
-.coinslot:before {
-	content: "Insert coin";
-	position: absolute;
-	left: 20px;
-	top: 20px;
-	font: bold 10px Arial;
-	color: #111;
-}
-.coinslot:after {
-	position: absolute;
-	left: 84px;
-	top: 16px;
-	content: "";
-	width: 4px;
-	height: 22px;
-	background: #111;
-}
-.powersocket {
-	position: absolute;
-    bottom: 15px;
-	right: 10px;
-	width: 24px;
-	height: 24px;
-	border-radius: 3px;
-	background: #aaa;
-	border: 1px solid #aaa;
-}
-.powersocket:before, .powersocket:after {
-  content: "";
-  position: absolute;
-  left: 6px;
-  top: 10px;
-  width: 4px;
-  height: 4px;
-  background-color: black;
-}
-.powersocket:after {
-  background-color: black;
-  left: 14px;
+.top{
+	width: 60px;
+	height: 0;
+	border-right:20px solid transparent;
+	border-left: 0 solid transparent;
+	border-bottom: 40px solid #3498db;
+	position:absolute;
+	right:0;
+	top:0;
 }
 
 .screen {
- display: inline-block;
- position: relative;
- width: 300px; /* 150px */
- height: 260px; /* 120px */
- margin: 35px 40px 0 40px; /* 35px 20px 0 20px */
- background: #111;
- border-radius: 50% / 10%;
- color: white;
- z-index: 0;
+	width:80px;
+	height: 0;
+	border-right: 0 solid transparent;
+	border-left: 60px solid transparent;
+	border-bottom: 130px solid #3498db;
 }
-.screen:before {
- content: "";
- position: absolute;
- top: 10%;
- bottom: 10%;
- right: -5%;
- left: -5%;
- z-index: -1;
- background: inherit;
- border-radius: 5% / 50%;
+
+.bottom{
+	width:140px;
+	height:100px;
+	transform:translateY(-10px);
+	background-color:#3498db;
 }
-.paneltop {
-  overflow: hidden;
-  text-align: center;
+.table{
+	width:200px;
+	height:35px;
+	transform:translate(-60px,-1px);
+	background-color:#3498db;
 }
-.playerleft {
-  float: left;
-    margin-top: 60px;
-  margin-left: 65px;
+
+.button{
+	height:5px;
+	width:15px;
+	background-color:#f1c40f;
+	transform:translate(10px,-5px);
+	border-top-right-radius:5px;
+	border-top-left-radius:5px;
 }
-.playerleft .button {
-  margin-right: 10px;
+
+.stick{
+	height:20px;
+	width:5px;
+	background-color:#7f8c8d;
+	transform:translate(35px,-25px);
 }
-.playerright {
-	padding-left: 40px;
-  float: right;
-  margin-top: -40px;
-  margin-right: 20px;
+
+.stick:after{
+	content:"";
+	border-radius:50%;
+	height:15px;
+	width:15px;
+	background-color:#e74c3c;
+	position:absolute;
+	margin-top:-10px;
+	margin-left:-5px;
 }
-.playercenter {
-    margin-top: 60px;
-    margin-right: 50px;
+
+.monitor{
+	position:absolute;
+	height:130px;
+	border-top-left-radius:5px;
+	border-bottom-left-radius:5px;
+	width:3px;
+	margin-left:29px;
+	transform:rotate(25deg);
+	margin-top:-5px;
+	background-color:rgb(66, 244, 220);
+	box-shadow: -10px 0 35px 5px rgba(66, 244, 220, .5);
 }
+
+.screw{
+	height:5px;
+	width:5px;
+	border-radius:50%;
+	background-color:#34495e;
+	position:absolute;
+}
+
+.screwleftBottom{
+	bottom:5px;
+	left:5px;
+}
+
+.screwRight{
+	bottom:5px;
+	right:5px;
+}
+
+.screwTop{
+	top:5px;
+	left:5px;
+}
+
+
+.panels{
+	margin:0 auto;
+	text-align:center;
+}
+
+.panel{
+	height:30px;
+	width:3px;
+	display:inline-block;
+	margin-right:2px;
+	margin-top:30px;
+	background-color:#34495e;
+}
+
+.line{
+	background-color:#34495e;
+	height:10px;
+	width:150px;
+	transform:translate(-5px);
+	margin-top:10px;
+}
+
+.machine:after{
+	content:"";
+	position:absolute;
+	height:230px;
+	width:6px;
+	border-top-right-radius:10px;
+	border-bottom-right-radius:10px;
+	background-color:#34495e;
+	margin-left:100%;
+	margin-top:-250px;
+}
+
+
+.line{
+	background-color:#34495e;
+	height:10px;
+	width:150px;
+	transform:translate(-5px);
+	margin-top:10px;
+}
+
+@keyframes moveStick{
+	0%{transform:translate(35px,-24px) rotate(0deg);}
+	30%{transform:translate(35px,-24px) rotate(10deg);}
+	60%{transform:translate(35px,-24px) rotate(-10deg);}
+}
+
+@keyframes push{
+	0%{height:5px;}
+	50%{height:4px;
+		transform:translate(10px,-4px);}
+}
+
+@keyframes shake{
+	0%{transform: translate(-50%,-51%) rotate(0deg);}
+	30%{transform: translate(-51%,-50%) rotate(1deg);}
+	60%{transform: translate(-49%,-50%) rotate(-1deg);}
+}
+
+.stick{
+	animation: moveStick .5s infinite;
+}
+
+.button{
+	animation:push .2s infinite;
+}
+
+.machine{
+	animation:shake .4s infinite;
+}
+
