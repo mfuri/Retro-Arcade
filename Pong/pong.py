@@ -52,13 +52,16 @@ pen.write("{} {}".format(score1, score2), align="center",
 # #### movement function #####
 def pad1_up():
     y_cor = pad1.ycor()
-    y_cor += 20
+    y_cor += 3
     pad1.sety(y_cor)
+    # y_cor = pad1.ycor()
+    # y_cor += 20
+    # pad1.sety(y_cor)
 
 
 def pad1_down():
     y_cor = pad1.ycor()
-    y_cor -= 20
+    y_cor -= 3
     pad1.sety(y_cor)
 
 
@@ -93,6 +96,12 @@ while True:
     # ### ball movement ####
     ball.setx(ball.xcor() + ball.dx)
     ball.sety(ball.ycor() + ball.dy)
+
+    # paddle movement with ball
+    if pad1.ycor() < ball.ycor():
+        pad1_up()
+    if pad1.ycor() > ball.ycor():
+        pad1_down()
 
     # wall bouncing top and bottom
     if ball.ycor() > 390:
@@ -129,3 +138,13 @@ while True:
                                and ball.ycor() > pad2.ycor() - 50)):
         ball.setx(430)
         ball.dx *= -1
+
+    if score1 == 10 or score2 == 10:
+        # end game
+        # score 1 means computer won
+        # score 2 means player won
+        score1 *= 10
+        score2 *= 10
+        final_score = score2 - score1
+        if final_score < 0:
+            final_score = 0
