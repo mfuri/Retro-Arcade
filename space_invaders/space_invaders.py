@@ -75,6 +75,8 @@ class Rocket(pygame.sprite.Sprite):
             screen.blit(self.surf, rocket) 
     def shoot(self):
         self.rect.y -= 2
+    def update(self, rocket):
+        screen.blit(self.surf, rocket)
 
 class Background:
     def __init__(self, width, height):
@@ -140,6 +142,7 @@ class Alien(pygame.sprite.Sprite):
             for alien in alien_list:
                 for rocket in rocket_list:
                     if rocket.rect.colliderect(alien):
+                        pygame.mixer.Sound.play(kill_sound)
                         alien_list.remove(alien)
                         rocket_list.remove(rocket)
                         print(i)
@@ -155,6 +158,10 @@ screen = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))
 
 bg = Background(SCREEN_WIDTH,SCREEN_HEIGHT)
 ship = Ship()
+
+#Sounds
+shoot_sound = pygame.mixer.Sound("assets/sounds/laser.wav")
+kill_sound = pygame.mixer.Sound("assets/sounds/kill.wav")
 
 #Sets ship location
 ship.rect.x = SCREEN_WIDTH / 2 - 12   # go to x
@@ -191,7 +198,7 @@ def continue_overlay(level):
     continue_text = continue_font.render("Space to Continue (Q or ESC to Quit)", True, (255,255,255))
     continue_rect = continue_text.get_rect(center = ((SCREEN_WIDTH / 2), (SCREEN_HEIGHT / 2)-20))
     if (level > 0):
-        level_text = continue_font.render("You made it to level " + str(level) + "!", True, (255,255,255))
+        level_text = continue_font.render("You cleared level " + str(level) + "!", True, (255,255,255))
         level_rect = level_text.get_rect(center = ((SCREEN_WIDTH / 2), (SCREEN_HEIGHT / 2)+20))
         screen.blit(level_text, level_rect)
     screen.blit(continue_text,continue_rect)
@@ -236,6 +243,7 @@ while True:
                 sys.exit()
             elif event.type == KEYDOWN and event.key == K_SPACE:
                 rockets.append(Rocket(ship.rect.x+11, ship.rect.y))
+                pygame.mixer.Sound.play(shoot_sound)
             if event.type == MOVEALIENS:
                 alien.move_aliens(aliens, move_value) 
         #check collision
@@ -244,8 +252,6 @@ while True:
             running = False
 
         if len(aliens) == 0:
-            for rocket in rockets:
-                rockets.remove(rocket)
             next_level = True
             level += 1
             while next_level:
@@ -260,6 +266,9 @@ while True:
             print("NEXT LEVEL")
             move_value += 4
             alien.create_alien_list(aliens)
+            for rocket in rockets:
+                rockets.remove(rocket)
+                rocket.update(rocket)
 
 
         #Press and hold arrow keys allow ship to move calling move functions
