@@ -61,9 +61,9 @@ class Ship(pygame.sprite.Sprite):
         screen.blit(self.surf, ((SCREEN_WIDTH / 2, SCREEN_HEIGHT - 20)))
     def check_alive(self, alien_list):
         #Check collision here
-        for alien in alien_list:
-            if (alien.rect.y == SCREEN_HEIGHT - 20):
-                self.alive = False
+        #for alien in alien_list:
+           # if (alien.rect.y == SCREEN_HEIGHT - 20):
+               # self.alive = False
 
 #Code inspiration: https://www.techwithtim.net/tutorials/game-development-with-python/pygame-tutorial/projectiles/
 class Rocket(pygame.sprite.Sprite):
