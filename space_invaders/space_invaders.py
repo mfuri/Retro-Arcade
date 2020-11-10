@@ -169,10 +169,10 @@ ship = Ship()
 
 #Sounds
 #Source: https://opengameart.org/content/512-sound-effects-8-bit-style
-shoot_sound = pygame.mixer.Sound("assets/sounds/laser.wav")
-kill_sound = pygame.mixer.Sound("assets/sounds/kill.wav")
-death_sound = pygame.mixer.Sound("assets/sounds/death.wav")
-error_sound = pygame.mixer.Sound("assets/sounds/error.wav")
+shoot_sound = pygame.mixer.Sound("assets/sounds/space_laser.wav")
+kill_sound = pygame.mixer.Sound("assets/sounds/space_kill.wav")
+death_sound = pygame.mixer.Sound("assets/sounds/space_death.wav")
+error_sound = pygame.mixer.Sound("assets/sounds/space_error.wav")
 
 #Sets ship location
 ship.rect.x = SCREEN_WIDTH / 2 - 12   # go to x
@@ -198,13 +198,13 @@ pygame.time.set_timer(MOVEALIENS, time)
 
 #Draws Welcome Message
 def welcome_overlay():
-    welcome_font = pygame.font.Font('assets/A-Space.otf', 18)
+    welcome_font = pygame.font.Font('assets/fonts/A-Space.otf', 18)
     welcome_text = welcome_font.render("Press Space to Start (Q or ESC to Quit)", True, (255,255,255))
     welcome_rect = welcome_text.get_rect(center = ((SCREEN_WIDTH / 2), (SCREEN_HEIGHT / 2)))
     screen.blit(welcome_text, welcome_rect)
 
 def continue_overlay(level):
-    continue_font = pygame.font.Font('assets/A-Space.otf', 18)
+    continue_font = pygame.font.Font('assets/fonts/A-Space.otf', 18)
     continue_text = continue_font.render("Space to Continue (Q or ESC to Quit)", True, (255,255,255))
     continue_rect = continue_text.get_rect(center = ((SCREEN_WIDTH / 2), (SCREEN_HEIGHT / 2)-20))
     if (level > 0):
