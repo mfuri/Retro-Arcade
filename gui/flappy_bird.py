@@ -2,16 +2,18 @@
 #high score should be number of seconds
 #press space to continue or q to quit
 #contributers: Michael and Mackenzie
-import random
-import os
-from os import environ
-import sys
-import random
-environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 
-import pygame
+#import random
+#import os
+#from os import environ
+#import sys
+#import random
+#environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
+
+#import pygame
 from pygame.locals import *
-import pygame.freetype
+#import pygame.freetype
+
 
 def Flappy_Game():
     #Imports keyboard controls for Pygame

@@ -1,8 +1,16 @@
+import pygame
+import random
+import sys
+import pygame.freetype
+import os
+from os import environ
+environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 import PySimpleGUI as sg
+
 # import trinket as tk
 from pong import *
+#from space_invaders import *
 from flappy_bird import *
-from space_invaders import *
 
 sg.theme('Dark')
 
@@ -32,6 +40,5 @@ while True:
     if event == 'Snake':
         print('We need to run Snake')
     if event == 'Space Invaders':
-        
         print('We need to run Space Invaders')
 window.close()
