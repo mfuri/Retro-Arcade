@@ -180,7 +180,7 @@ def continue_overlay(level):
     screen.blit(continue_text,continue_rect)
 
 #game function
-def Game():
+def SI_Game():
     screen = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))
 
     bg = Background(SCREEN_WIDTH,SCREEN_HEIGHT)
