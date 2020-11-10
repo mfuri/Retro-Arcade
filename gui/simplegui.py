@@ -2,6 +2,7 @@ import PySimpleGUI as sg
 # import trinket as tk
 from pong import *
 from flappy_bird import *
+from space_invaders import *
 
 sg.theme('Dark')
 
@@ -26,10 +27,11 @@ while True:
         Game()
         print('We need to run Pong')
     if event == 'Flappy Bird':
-        Flappy()
+        Flappy_Game()
         print('We need to run Flappy Bird')
     if event == 'Snake':
         print('We need to run Snake')
     if event == 'Space Invaders':
+        
         print('We need to run Space Invaders')
 window.close()
