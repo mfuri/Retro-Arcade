@@ -13,7 +13,7 @@ import pygame
 from pygame.locals import *
 import pygame.freetype
 
-def Flappy():
+def Flappy_Game():
     #Imports keyboard controls for Pygame
     from pygame.locals import (
         K_SPACE,
