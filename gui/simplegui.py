@@ -1,6 +1,7 @@
 import PySimpleGUI as sg
 # import trinket as tk
 from pong import *
+from flappy_bird import *
 
 sg.theme('Dark')
 
