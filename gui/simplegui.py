@@ -25,6 +25,7 @@ while True:
         Game()
         print('We need to run Pong')
     if event == 'Flappy Bird':
+        Flappy()
         print('We need to run Flappy Bird')
     if event == 'Snake':
         print('We need to run Snake')
