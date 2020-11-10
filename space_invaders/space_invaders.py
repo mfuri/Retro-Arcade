@@ -59,7 +59,7 @@ class Ship(pygame.sprite.Sprite):
         #for enemy in hit_list:
             #self.alive = False
         screen.blit(self.surf, ((SCREEN_WIDTH / 2, SCREEN_HEIGHT - 20)))
-    def check_alive(self, alien_list):
+    #def check_alive(self, alien_list):
         #Check collision here
         #for alien in alien_list:
            # if (alien.rect.y == SCREEN_HEIGHT - 20):
@@ -162,40 +162,6 @@ class Alien(pygame.sprite.Sprite):
                 return True
         return False
 
-screen = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))
-
-bg = Background(SCREEN_WIDTH,SCREEN_HEIGHT)
-ship = Ship()
-
-#Sounds
-#Source: https://opengameart.org/content/512-sound-effects-8-bit-style
-shoot_sound = pygame.mixer.Sound("assets/sounds/space_laser.wav")
-kill_sound = pygame.mixer.Sound("assets/sounds/space_kill.wav")
-death_sound = pygame.mixer.Sound("assets/sounds/space_death.wav")
-error_sound = pygame.mixer.Sound("assets/sounds/space_error.wav")
-
-#Sets ship location
-ship.rect.x = SCREEN_WIDTH / 2 - 12   # go to x
-ship.rect.y = SCREEN_HEIGHT - 50  # go to y
-player_list = pygame.sprite.Group()
-player_list.add(ship)
-
-#Flips display
-pygame.display.flip()
-
-#Create List of Aliens
-alien = Alien()
-aliens = []
-alien.create_alien_list(aliens)
-
-#Create list of rockets
-rockets = []
-
-MOVEALIENS = pygame.USEREVENT
-time = 1500
-#aliens move every 1.5 seconds
-pygame.time.set_timer(MOVEALIENS, time)
-
 #Draws Welcome Message
 def welcome_overlay():
     welcome_font = pygame.font.Font('assets/fonts/A-Space.otf', 18)
@@ -213,85 +179,122 @@ def continue_overlay(level):
         screen.blit(level_text, level_rect)
     screen.blit(continue_text,continue_rect)
 
+#game function
+def Game():
+    screen = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))
 
-rocket_list = pygame.sprite.Group()
+    bg = Background(SCREEN_WIDTH,SCREEN_HEIGHT)
+    ship = Ship()
 
-running = True
-start_screen = True
-move_value = 1
-level = 0
-while True:
-    while start_screen:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT or (event.type == KEYDOWN and (event.key == K_ESCAPE or event.key == K_q)):
+    #Sounds
+    #Source: https://opengameart.org/content/512-sound-effects-8-bit-style
+    shoot_sound = pygame.mixer.Sound("assets/sounds/space_laser.wav")
+    kill_sound = pygame.mixer.Sound("assets/sounds/space_kill.wav")
+    death_sound = pygame.mixer.Sound("assets/sounds/space_death.wav")
+    error_sound = pygame.mixer.Sound("assets/sounds/space_error.wav")
+
+    #Sets ship location
+    ship.rect.x = SCREEN_WIDTH / 2 - 12   # go to x
+    ship.rect.y = SCREEN_HEIGHT - 50  # go to y
+    player_list = pygame.sprite.Group()
+    player_list.add(ship)
+
+    #Flips display
+    pygame.display.flip()
+
+    #Create List of Aliens
+    alien = Alien()
+    aliens = []
+    alien.create_alien_list(aliens)
+
+    #Create list of rockets
+    rockets = []
+
+    MOVEALIENS = pygame.USEREVENT
+    time = 1500
+    #aliens move every 1.5 seconds
+    pygame.time.set_timer(MOVEALIENS, time)
+
+
+
+
+    rocket_list = pygame.sprite.Group()
+
+    running = True
+    start_screen = True
+    move_value = 1
+    level = 0   
+    while True:
+        while start_screen:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT or (event.type == KEYDOWN and (event.key == K_ESCAPE or event.key == K_q)):
                     pygame.quit()
                     sys.exit()
-            elif event.type == KEYDOWN and event.key == K_SPACE:
+                elif event.type == KEYDOWN and event.key == K_SPACE:
                     level = 0
                     start_screen = False
-            elif event.type == KEYDOWN and (event.key != K_SPACE or event.key != K_ESCAPE or event.key != K_q):
+                elif event.type == KEYDOWN and (event.key != K_SPACE or event.key != K_ESCAPE or event.key != K_q):
                     pygame.mixer.Sound.play(error_sound)
                     #Will play error sound when invaid key is pressed
-        screen.fill((0,0,0))
-        welcome_overlay()
-        pygame.display.flip()
-    while running:
-        #as level increases, increase move_value by 1 as well
-        keys = pygame.key.get_pressed()
-        screen.fill((0,0,0))
-        screen.blit(ship.surf,ship.rect)
-        alien.draw_alien(aliens)
-        
-        #Changed implementation of rockets to sprite group
-        rocket_list.update()
-        rocket_list.draw(screen)
-        pygame.display.flip()
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT or (event.type == KEYDOWN and (event.key == K_ESCAPE or event.key == K_q)):
-                pygame.quit()
-                sys.exit()
-            elif event.type == KEYDOWN and event.key == K_SPACE:
-                rocket = Rocket(ship.rect.x+11, ship.rect.y)
-                rocket_list.add(rocket)
-                rocket_list.draw(screen)
-
-                pygame.mixer.Sound.play(shoot_sound)
-            if event.type == MOVEALIENS:
-                alien.move_aliens(aliens, move_value) 
-        #check collision
-
-        alien.rocket_collision(aliens,rocket_list)
-        if alien.screen_collision(aliens):
-            running = False
-
-        #Checks if lost
-        ship.check_alive(aliens)
-        if (ship.alive == False):
-            print("You Lose on Level: " + str(level))
-
-        if len(aliens) == 0:
-            next_level = True
-            level += 1
-            while next_level:
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT or (event.type == KEYDOWN and (event.key == K_ESCAPE or event.key == K_q)):
-                        pygame.quit()
-                        sys.exit()
-                    elif event.type == KEYDOWN and event.key == K_SPACE:
-                        next_level = False
-                continue_overlay(level)
-                pygame.display.flip()
-            print("NEXT LEVEL")
-            move_value += 4
-            alien.create_alien_list(aliens)
-            rocket_list.empty()
-            ship.rect.center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT - 20)
+            screen.fill((0,0,0))
+            welcome_overlay()
             pygame.display.flip()
+        while running:
+            #as level increases, increase move_value by 1 as well
+            keys = pygame.key.get_pressed()
+            screen.fill((0,0,0))
+            screen.blit(ship.surf,ship.rect)
+            alien.draw_alien(aliens)
+        
+            #Changed implementation of rockets to sprite group
+            rocket_list.update()
+            rocket_list.draw(screen)
+            pygame.display.flip()
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT or (event.type == KEYDOWN and (event.key == K_ESCAPE or event.key == K_q)):
+                    pygame.quit()
+                    sys.exit()
+                elif event.type == KEYDOWN and event.key == K_SPACE:
+                    rocket = Rocket(ship.rect.x+11, ship.rect.y)
+                    rocket_list.add(rocket)
+                    rocket_list.draw(screen)
+
+                    pygame.mixer.Sound.play(shoot_sound)
+                if event.type == MOVEALIENS:
+                    alien.move_aliens(aliens, move_value) 
+            #check collision
+
+            alien.rocket_collision(aliens,rocket_list)
+            if alien.screen_collision(aliens):
+                running = False
+
+            #Checks if lost
+            ship.check_alive(aliens)
+            if (ship.alive == False):
+                print("You Lose on Level: " + str(level))
+
+            if len(aliens) == 0:
+                next_level = True
+                level += 1
+                while next_level:
+                    for event in pygame.event.get():
+                        if event.type == pygame.QUIT or (event.type == KEYDOWN and (event.key == K_ESCAPE or event.key == K_q)):
+                            pygame.quit()
+                            sys.exit()
+                        elif event.type == KEYDOWN and event.key == K_SPACE:
+                            next_level = False
+                    continue_overlay(level)
+                    pygame.display.flip()
+                print("NEXT LEVEL")
+                move_value += 4
+                alien.create_alien_list(aliens)
+                rocket_list.empty()
+                ship.rect.center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT - 20)
+                pygame.display.flip()
 
 
-        #Press and hold arrow keys allow ship to move calling move functions
-        if keys[pygame.K_LEFT]:
-            ship.move_left()
-        if keys[pygame.K_RIGHT]:
-            ship.move_right()
-            
+            #Press and hold arrow keys allow ship to move calling move functions
+            if keys[pygame.K_LEFT]:
+                ship.move_left()
+            if keys[pygame.K_RIGHT]:
+                ship.move_right()            
