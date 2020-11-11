@@ -264,7 +264,7 @@ def SI_Game():
                 running = False
 
             #Checks if lost
-            ship.check_alive(aliens)
+            #ship.check_alive(aliens)
             if (ship.alive == False):
                 print("You Lose on Level: " + str(level))
 
