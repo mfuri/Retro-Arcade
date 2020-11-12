@@ -192,6 +192,7 @@ def Flappy_Game():
 
     flappy = True
     points = 0
+    highest score = 0
     while flappy:
         player = Player()
         all_sprites = pygame.sprite.Group()
