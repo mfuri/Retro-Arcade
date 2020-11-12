@@ -204,7 +204,8 @@ def Flappy_Game():
             for event in pygame.event.get():
                     if event.type == pygame.QUIT or (event.type == KEYDOWN and (event.key == K_ESCAPE or event.key == K_q)):
                         pygame.quit()
-                        sys.exit()
+                        return points
+                        #sys.exit()
                     elif event.type == KEYDOWN and event.key == K_SPACE:
                         player.jump()
                         pygame.mixer.Sound.play(flap_sound)
@@ -239,7 +240,8 @@ def Flappy_Game():
                     pygame.mixer.Sound.play(flap_sound)
                 elif event.type == KEYDOWN and (event.key == K_q or K_ESCAPE):
                     pygame.quit()
-                    sys.exit()
+                    return points
+                    #sys.exit()
                 if event.type == SPAWNPIPE:
                     pipes.extend(pipe.create_new_pipe())
                     
@@ -283,7 +285,8 @@ def Flappy_Game():
                     pygame.mixer.Sound.play(restart_sound)
                 elif event.type == KEYDOWN and (event.key == K_q or K_ESCAPE):
                     pygame.quit()
-                    sys.exit()
+                    return points
+                    #sys.exit()
                     running = False
                     flappy = False
             #loads background image into game
