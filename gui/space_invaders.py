@@ -3,28 +3,28 @@
 #press space to shoot and arrow keys to move or q to quit
 #contributers: Michael and Mackenzie
 
-#import random
-#import copy
-#import os
-#from os import environ
-#import sys
-#import random
-#from decimal import Decimal as D
-#import pickle
-#environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
+import random
+import copy
+import os
+from os import environ
+import sys
+import random
+from decimal import Decimal as D
+import pickle
+environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 
-#import pygame
-#from pygame.locals import *
+import pygame
+from pygame.locals import *
 
-#from pygame.locals import (
-#    K_SPACE,
-#    K_RIGHT,
-#    K_LEFT,
-#    K_UP,
-#    K_q,
-#    K_ESCAPE,
-#    QUIT,
-#)
+from pygame.locals import (
+   K_SPACE,
+   K_RIGHT,
+   K_LEFT,
+   K_UP,
+   K_q,
+   K_ESCAPE,
+   QUIT,
+)
 
 #game function
 def SI_Game():

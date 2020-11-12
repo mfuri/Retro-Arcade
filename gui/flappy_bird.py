@@ -3,16 +3,16 @@
 #press space to continue or q to quit
 #contributers: Michael and Mackenzie
 
-#import random
-#import os
-#from os import environ
-#import sys
-#import random
-#environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
+import random
+import os
+from os import environ
+import sys
+import random
+environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 
-#import pygame
+import pygame
 from pygame.locals import *
-#import pygame.freetype
+import pygame.freetype
 
 
 def Flappy_Game():
@@ -192,7 +192,7 @@ def Flappy_Game():
 
     flappy = True
     points = 0
-    highest score = 0
+    highest_score = 0
     while flappy:
         player = Player()
         all_sprites = pygame.sprite.Group()

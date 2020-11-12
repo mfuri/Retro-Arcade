@@ -5,7 +5,7 @@ import importlib
 import flappy_bird
 import space_invaders
 import pong
-import snake
+#import snake
 
 #Keep libraries in game code (don't need to add it here)
 #comment out sys.exit() in game code (if present), add return value
