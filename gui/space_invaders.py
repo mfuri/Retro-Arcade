@@ -224,7 +224,8 @@ def SI_Game():
             for event in pygame.event.get():
                 if event.type == pygame.QUIT or (event.type == KEYDOWN and (event.key == K_ESCAPE or event.key == K_q)):
                     pygame.quit()
-                    sys.exit()
+                    return level
+                    #sys.exit()
                 elif event.type == KEYDOWN and event.key == K_SPACE:
                     level = 0
                     start_screen = False
@@ -248,7 +249,8 @@ def SI_Game():
             for event in pygame.event.get():
                 if event.type == pygame.QUIT or (event.type == KEYDOWN and (event.key == K_ESCAPE or event.key == K_q)):
                     pygame.quit()
-                    sys.exit()
+                    return level
+                    #sys.exit()
                 elif event.type == KEYDOWN and event.key == K_SPACE:
                     rocket = Rocket(ship.rect.x+11, ship.rect.y)
                     rocket_list.add(rocket)
@@ -275,7 +277,8 @@ def SI_Game():
                     for event in pygame.event.get():
                         if event.type == pygame.QUIT or (event.type == KEYDOWN and (event.key == K_ESCAPE or event.key == K_q)):
                             pygame.quit()
-                            sys.exit()
+                            return level
+                            #sys.exit()
                         elif event.type == KEYDOWN and event.key == K_SPACE:
                             next_level = False
                     continue_overlay(level)
