@@ -219,6 +219,7 @@ def SI_Game():
     start_screen = True
     move_value = 1
     level = 0   
+    highest_score = 0
     while True:
         while start_screen:
             for event in pygame.event.get():
