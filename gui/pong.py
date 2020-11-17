@@ -171,14 +171,14 @@ def PongGame():
                 final_score = 0
 
 
-screen = turtle.Screen()
-startmenu = turtle.Turtle()
-startmenu.hideturtle()
-startmenu.penup()
-startmenu.sety(360)
-startmenu.write("Press SPACE to start", align="center", font=("Courier", 36, "normal"))
+    screen = turtle.Screen()
+    startmenu = turtle.Turtle()
+    startmenu.hideturtle()
+    startmenu.penup()
+    startmenu.sety(360)
+    startmenu.write("Press SPACE to start", align="center", font=("Courier", 36, "normal"))
 
-screen.onkeypress(PongGame, 'space')
-screen.listen()
+    screen.onkeypress(PongGame, 'space')
+    screen.listen()
 
 
