@@ -83,7 +83,7 @@ while True:
 
         elif event == "Pong":
             print("PLAY PONG")
-            pong.Game()  
+            pong.PongGame()  
 
         elif event == "Space Invaders":
             print("PLAY SPACE INVADERS")
