@@ -122,4 +122,4 @@ def Snake():
 
             pygame.display.flip()
             pygame.display.update()
-            fpsClock.tick(FPS 
+            fpsClock.tick(FPS)
