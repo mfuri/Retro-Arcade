@@ -2,29 +2,35 @@
 # Seth Polen SE project 2020
 import turtle   # built in no need to install
 
+start = False
 
-def StartMenu():
-    win = turtle.Screen()
-    win.title("Start Menu")
-    win.bgcolor("black")
-    win.setup(width = 1200, height = 1000)
+#def StartMenu():
+   # win = turtle.Screen()
+   # win.title("Start Menu")
+   # win.bgcolor("black")
+   # win.setup(width = 1200, height = 1000)
 
-    win.tracer(0)
-    pen = turtle.Turtle()
-    pen.speed(0)
-    pen.color("white")
-    pen.penup()
-    pen.hideturtle()
-    pen.goto(0,320)
-    pen.write("Press Space to start or Esc to exit", align="center",
-	      font=("Courier", 36, "normal"))
+   # win.tracer(0)
+   # pen = turtle.Turtle()
+   # pen.speed(0)
+   # pen.color("white")
+   # pen.penup()
+   # pen.setposition(0,320)
+   # pen.pendown()
+   # pen.write("Press Space to start or Esc to exit", align="center",
+#	      font=("Courier", 36, "normal"))
 
-    win.listen()
-    win.onkeypress(win.bye, "Escape")
-    win.onkeypress(PongGame, "space")
+   # win.listen()
+   # win.onkeypress(win.bye, "Escape")
+   # win.onkeypress(PongGame(), "space")
+   # win.list()
 
 # main loop
 def PongGame():
+    global start
+    startmenu.clear()
+    start = true 
+
     wn = turtle.Screen()
     wn.title("Pong Game")
 
@@ -165,4 +171,14 @@ def PongGame():
                 final_score = 0
 
 
-StartMenu()
+screen = turtle.Screen()
+startmenu = turtle.Turtle()
+startmenu.hideturtle()
+startmenu.penup()
+startmenu.sety(360)
+startmenu.write("Press SPACE to start", align="center", font=("Courier", 36, "normal"))
+
+screen.onkeypress(PongGame, 'space')
+screen.listen()
+
+
