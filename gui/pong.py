@@ -3,8 +3,28 @@
 import turtle   # built in no need to install
 
 
+def StartMenu():
+    win = turtle.Screen()
+    win.title("Start Menu")
+    win.bgcolor("black")
+    win.setup(width = 1200, height = 1000)
+
+    win.tracer(0)
+    pen = turtle.Turtle()
+    pen.speed(0)
+    pen.color("white")
+    pen.penup()
+    pen.hideturtle()
+    pen.goto(0,320)
+    pen.write("Press Space to start or Esc to exit", align="center",
+	      font=("Courier", 36, "normal"))
+
+    win.listen()
+    win.onkeypress(win.bye, "Escape")
+    win.onkeypress(PongGame, "space")
+
 # main loop
-def Game():
+def PongGame():
     wn = turtle.Screen()
     wn.title("Pong Game")
 
@@ -143,3 +163,6 @@ def Game():
             final_score = score2 - score1
             if final_score < 0:
                 final_score = 0
+
+
+StartMenu()
