@@ -5,6 +5,7 @@ import importlib
 import flappy_bird
 import space_invaders
 import pong
+import snake
 #import snake
 
 #Keep libraries in game code (don't need to add it here)
@@ -92,7 +93,7 @@ while True:
 
         elif event == "Snake":
             print("PLAY SNAKE")
-            snake.game()
+            snake.Snake()
 
         elif event == 'My Stats':
             print("VIEW STATS")
