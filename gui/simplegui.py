@@ -10,7 +10,7 @@ import PySimpleGUI as sg
 # import trinket as tk
 from pong import *
 #from space_invaders import *
-from flappy_bird import *
+import flappy_bird
 
 sg.theme('Dark')
 
