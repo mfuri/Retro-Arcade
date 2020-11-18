@@ -248,6 +248,3 @@ while True:
             games_window = sg.Window('RETRO ARCADE', games_layout, size=(852,480))
                     
             games_window_open = True
-
-def login():
-    print(y );
