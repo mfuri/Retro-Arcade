@@ -41,6 +41,8 @@ signup_window_open = False
 games_window_open = False
 final_sign_in = False
 final_sign_up = False
+successful_info = False
+unsuccessful_info = False
 
 # User Login
 login_success = False
@@ -56,13 +58,22 @@ while True:
     if not main_window_hidden:       
         event, values = main_window.read()
     elif signin_window_open:
+
+        #if info not entered in every field -> reload sign in window
         if final_sign_in:
             event = 'Sign In'
             signin_window.close()
             final_sign_in = False
+
+        #if info entered is not found in database -> reload sign in window
+        elif unsuccessful_info:
+            event = 'Sign In'
+            signin_window.close()
+            unsuccessful_info = False
+
+        #read sign in window
         else:
             event, values = signin_window.read()
-
 
             try:
                 Email = values.get('Email')
@@ -76,19 +87,24 @@ while True:
                 if(num_rows < 0):
                     print("Username/Password combination not found in the database.")
                     events, value = signin_window.read()
+                    #unsuccessful_info = True
                     # Rather than re-executing query, maybe have user try again? I assume that's what you meant -ABL
                 elif(num_rows == 1):
                     print("Login successful.") # -> if valid, open games_window
+                    successful_info = True
                     #games_window_open.open()
                 elif(num_rows > 1):
                     print("Duplicate record(s) found.")
                 else:
                     print("Unknown failure fetching username & password.")
+                    unsuccessful_info = True
 
             except Error as error:
                 print("sql_login_query failed to fetch record.", error)
+                #unsuccessful_info = True
             finally:
                 print("sql_login_query executed successfully.")
+                #unsuccessful_info = True
 
             #here connect to db -> steps:
             #prereq: ALL INFO FIELDS MUST HAVE TEXT
@@ -155,6 +171,9 @@ while True:
             games_window_open = False
             games_window.close()
 
+            #sets login success to false until user signs in again
+            unsuccessful_info = False
+            successful_info = False
     #print(event, values)
     
     if event == 'Sign In':
@@ -215,17 +234,28 @@ while True:
                     final_sign_up = True
             if final_sign_up:
                 sg.popup_ok('Please enter information into ALL fields.')
+            elif unsuccessful_info:
+                sg.popup_ok('INFO INVALID. Please enter again.')
+
         #CHECK FOR COMPLETE FIELDS FOR SIGN IN
         else:
+            #loop to check if info was entered into every field
             for value in values:
                 if values[value] == '' or values[value] == '':
                     final_sign_in = True
+
+            #pop up if user does not enter info into every field
             if final_sign_in:
                 sg.popup_ok('Please enter both your email and password.')
 
+            #pop up if user enters invalid info
+            elif unsuccessful_info:
+                sg.popup_ok('Information entered invalid. Please try again.')
+
+
         #if all fields have been filled in -> still have to check if info provided is valid
         #could have another bool that we set to true only when user info has been confirmed
-        if (final_sign_up != True) and (final_sign_in != True):
+        if (final_sign_up != True) and (final_sign_in != True) and (successful_info == True):
             
             if signin_window_open:
                 signin_window.close()
