@@ -21,7 +21,14 @@ sg.Button("Exit", button_color=('dark grey', 'dark violet'))],
 [sg.Image("1.png")]]
 
 #connect to db
-conn = sqlite3.connect('retro-arcade.db')
+try:
+    conn = sqlite3.connect('retro-arcade.db')
+    cursor = conn.cursor()
+    print("Connected to the SQLite3 database.")
+
+except Error as error:
+    print("Error connecting to the database.")
+
 
 #Create the Main Window
 main_window = sg.Window('RETRO ARCADE', main_layout, size=(852,480))
@@ -34,6 +41,12 @@ signup_window_open = False
 games_window_open = False
 final_sign_in = False
 final_sign_up = False
+
+# User Login
+login_success = False
+
+# User Sign up
+signup_success = False
 
 #Event Loop to process "events"
 while True: 
@@ -50,11 +63,39 @@ while True:
         else:
             event, values = signin_window.read()
 
+
+            try:
+                Email = values.get('Email')
+                Pass = values.get('Password')
+
+                sql_login_query = cursor.execute("SELECT username,password FROM user WHERE user.username = ? AND user.password = ?", (Email,Pass))
+                rows = cursor.fetchall()
+                conn.commit() # finalize and end transaction with database
+
+                num_rows = len(rows)
+                if(num_rows < 0):
+                    print("Username/Password combination not found in the database.")
+                    events, value = signin_window.read()
+                    # Rather than re-executing query, maybe have user try again? I assume that's what you meant -ABL
+                elif(num_rows == 1):
+                    print("Login successful.") # -> if valid, open games_window
+                    #games_window_open.open()
+                elif(num_rows > 1):
+                    print("Duplicate record(s) found.")
+                else:
+                    print("Unknown failure fetching username & password.")
+
+            except Error as error:
+                print("sql_login_query failed to fetch record.", error)
+            finally:
+                print("sql_login_query executed successfully.")
+
             #here connect to db -> steps:
             #prereq: ALL INFO FIELDS MUST HAVE TEXT
             #1. SELECT email, password FROM <user_info> WHERE email='<user_entry>' AND password='user_entry>';
             # -> if valid, open games_window
             # -> if invalid, popup with "INCORRECT INFO" Message, repeat 1
+
     elif signup_window_open:
         if final_sign_up:
             event = 'Sign Up'
@@ -207,3 +248,6 @@ while True:
             games_window = sg.Window('RETRO ARCADE', games_layout, size=(852,480))
                     
             games_window_open = True
+
+def login():
+    print(y );
