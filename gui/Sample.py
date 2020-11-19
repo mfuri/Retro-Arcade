@@ -120,7 +120,7 @@ while True:
             try:
                 Email = values.get('Email')
                 Pass = values.get('Password')
-                sql_check_username_query = cursor.execute("SELECT DISTINCT username COLLATE NOCASE FROM user"); # Retrieve username to lowercase
+                sql_check_username_query = cursor.execute("SELECT username COLLATE NOCASE FROM user"); # Retrieve username to lowercase
                 rows = cursor.fetchall()
                 conn.commit() # finalize and end transaction with database
 
@@ -130,7 +130,7 @@ while True:
 
                 print("Username available!")
                 # Username is available if we have gotten here
-                sql_signup_query = cursor.execute("INSERT INTO user(username, password) VALUES(?,?);", (Email, Pass,))
+                sql_signup_query = cursor.execute("INSERT OR IGNORE INTO user(username, password) VALUES(?,?);", (Email, Pass,))
                 print("Added username: ", Email, "\t with password: ", Pass)
                 conn.commit() # finalize transaction
 
