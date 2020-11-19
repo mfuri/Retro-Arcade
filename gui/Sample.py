@@ -1,12 +1,14 @@
-import PySimpleGUI as sg
+import hashlib
+import cryptography
 import sqlite3
 from sqlite3 import Error
-import importlib
-import flappy_bird
-import space_invaders
-import pygamepong
-import snake
-import hashlib
+
+import PySimpleGUI as sg
+
+from gui import flappy_bird
+from gui import pong
+from gui import snake
+from gui import space_invaders
 
 #Keep libraries in game code (don't need to add it here)
 #comment out sys.exit() in game code (if present), add return value
@@ -77,9 +79,12 @@ while True:
                 Pass = values.get('Password')
 
                 # Attempt to hash password
-                #Pass = hashlib.sha256(Username+Pass)
+                #Pass =
+                #print(hashlib.sha256(Username+Pass))
 
-                sql_login_query = cursor.execute("SELECT DISTINCT username,password FROM user WHERE user.username = ? AND user.password = ?", (Username,Pass))
+                sql_login_query = cursor.execute("SELECT DISTINCT username,password "
+                                                 "FROM user WHERE user.username = ? "
+                                                 "AND user.password = ?", (Username,Pass))
                 rows = cursor.fetchall()
                 conn.commit() # finalize and end transaction with database
 
