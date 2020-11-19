@@ -6,7 +6,7 @@ import flappy_bird
 import space_invaders
 import pong
 import snake
-#import snake
+import hashlib
 
 #Keep libraries in game code (don't need to add it here)
 #comment out sys.exit() in game code (if present), add return value
@@ -75,6 +75,9 @@ while True:
             try:
                 Username = values.get('Username')
                 Pass = values.get('Password')
+
+                # Attempt to hash password
+                #Pass = hashlib.sha256(Username+Pass)
 
                 sql_login_query = cursor.execute("SELECT DISTINCT username,password FROM user WHERE user.username = ? AND user.password = ?", (Username,Pass))
                 rows = cursor.fetchall()
