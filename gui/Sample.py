@@ -73,10 +73,10 @@ while True:
             event, values = signin_window.read()
 
             try:
-                Email = values.get('Email')
+                Username = values.get('Username')
                 Pass = values.get('Password')
 
-                sql_login_query = cursor.execute("SELECT DISTINCT username,password FROM user WHERE user.username = ? AND user.password = ?", (Email,Pass))
+                sql_login_query = cursor.execute("SELECT DISTINCT username,password FROM user WHERE user.username = ? AND user.password = ?", (Username,Pass))
                 rows = cursor.fetchall()
                 conn.commit() # finalize and end transaction with database
 
@@ -118,20 +118,20 @@ while True:
         else:
             event, values = signup_window.read()
             try:
-                Email = values.get('Email')
+                User = values.get('User')
                 Pass = values.get('Password')
                 sql_check_username_query = cursor.execute("SELECT username COLLATE NOCASE FROM user"); # Retrieve username to lowercase
                 rows = cursor.fetchall()
                 conn.commit() # finalize and end transaction with database
 
                 for element in rows:
-                    if Email == element:
+                    if User == element:
                         print("Username found in database. Please try another.")
 
                 print("Username available!")
                 # Username is available if we have gotten here
-                sql_signup_query = cursor.execute("INSERT OR IGNORE INTO user(username, password) VALUES(?,?);", (Email, Pass,))
-                print("Added username: ", Email, "\t with password: ", Pass)
+                sql_signup_query = cursor.execute("INSERT OR IGNORE INTO user(username, password) VALUES(?,?);", (User, Pass,))
+                print("Added username: ", User, "\t with password: ", Pass)
                 conn.commit() # finalize transaction
 
             except Error as error:
@@ -200,7 +200,7 @@ while True:
     
     if event == 'Sign In':
        
-        signin_layout = [[sg.Text("Email\t"), sg.InputText('', key='Email')],
+        signin_layout = [[sg.Text("Username\t"), sg.InputText('', key='Username')],
             [sg.Text('Password\t'), sg.InputText('', key='Password', password_char='*')],
             [sg.OK("Finish Sign In", button_color=('dark grey', 'dark violet')), 
             sg.OK("Back", button_color=('dark grey', 'dark violet')),
@@ -216,8 +216,7 @@ while True:
     elif event == 'Sign Up':
         print("sign up here")
 
-        signup_layout = [[sg.Text("Email\t"), sg.InputText('', key='Email')],
-                    [sg.Text("Username"), sg.InputText('', key='Username')], 
+        signup_layout = [[sg.Text("Username\t"), sg.InputText('', key='Username')],
                     [sg.Text('Password\t'), sg.InputText('', key='Password', password_char='*')], 
                     [sg.OK("Complete Sign Up", button_color=('dark grey', 'dark violet')), 
                     sg.OK("Back", button_color=('dark grey', 'dark violet')),
@@ -268,7 +267,7 @@ while True:
 
             #pop up if user does not enter info into every field
             if final_sign_in:
-                sg.popup_ok('Please enter both your email and password.')
+                sg.popup_ok('Please enter both your username and password.')
 
             #pop up if user enters invalid info
             elif unsuccessful_info:
