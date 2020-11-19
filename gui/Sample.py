@@ -44,11 +44,9 @@ final_sign_up = False
 successful_info = False
 unsuccessful_info = False
 
-# User Login
-login_success = False
+# User Login # login_success = False
 
-# User Sign up
-signup_success = False
+# User Sign up # signup_success = False
 
 #Event Loop to process "events"
 while True: 
@@ -101,6 +99,7 @@ while True:
 
             except Error as error:
                 print("sql_login_query failed to fetch record.", error)
+                break
                 #unsuccessful_info = True
             finally:
                 print("sql_login_query executed successfully.")
@@ -119,6 +118,31 @@ while True:
             final_sign_up = False
         else:
             event, values = signup_window.read()
+            try:
+                Email = values.get('Email')
+                Pass = values.get('Password')
+                sql_check_username_query = cursor.execute("SELECT username COLLATE NOCASE FROM user"); # Retrieve username to lowercase
+                rows = cursor.fetchall()
+                conn.commit() # finalize and end transaction with database
+
+                for element in rows:
+                    if Email == element:
+                        print("Username found in database. Please try another.")
+                        break
+
+                print("Username available!")
+                # Username is available if we have gotten here
+                sql_signup_query = cursor.execute("INSERT INTO user(username, password) VALUES(?,?);", (Email, Pass,))
+                print("Added username: ", Email, "\t with password: ", Pass)
+                conn.commit() # finalize transaction
+
+            except Error as error:
+                print("sql_signup_query failed to fetch record.", error)
+                break
+                #unsuccessful_info = True
+            finally:
+                print("sql_signup_query executed successfully.")
+                #unsuccessful_info = True
 
             #here is where we will access the db -> steps:
             #prereq: ALL INFO FIELDS MUST HAVE TEXT
