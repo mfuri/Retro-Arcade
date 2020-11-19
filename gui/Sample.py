@@ -45,7 +45,6 @@ successful_info = False
 unsuccessful_info = False
 
 # User Login # login_success = False
-
 # User Sign up # signup_success = False
 
 #Event Loop to process "events"
@@ -77,7 +76,7 @@ while True:
                 Email = values.get('Email')
                 Pass = values.get('Password')
 
-                sql_login_query = cursor.execute("SELECT username,password FROM user WHERE user.username = ? AND user.password = ?", (Email,Pass))
+                sql_login_query = cursor.execute("SELECT DISTINCT username,password FROM user WHERE user.username = ? AND user.password = ?", (Email,Pass))
                 rows = cursor.fetchall()
                 conn.commit() # finalize and end transaction with database
 
@@ -121,14 +120,13 @@ while True:
             try:
                 Email = values.get('Email')
                 Pass = values.get('Password')
-                sql_check_username_query = cursor.execute("SELECT username COLLATE NOCASE FROM user"); # Retrieve username to lowercase
+                sql_check_username_query = cursor.execute("SELECT DISTINCT username COLLATE NOCASE FROM user"); # Retrieve username to lowercase
                 rows = cursor.fetchall()
                 conn.commit() # finalize and end transaction with database
 
                 for element in rows:
                     if Email == element:
                         print("Username found in database. Please try another.")
-                        break
 
                 print("Username available!")
                 # Username is available if we have gotten here
