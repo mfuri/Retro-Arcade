@@ -13,6 +13,29 @@ player_speed = 0
 AI_Speed = 6.25
 
 
+def ballmovement():
+	ball = pygame.Rect(screen_width/2 - 15, screen_height/2 - 15,30,30)
+#	global ball
+	ball.x += 7
+	ball.y += 7
+	
+	######ball bounce#######
+	if ball.top <= 0 or ball.bottom >= screen_height:
+		y_ball_speed *= -1
+	if ball.left <= 0:
+		ball.center = (screen_width/2, screen_height/2)
+		y_ball_speed *= -1
+		x_speed *= -1
+		paddle1_score += 1
+	if ball.right >= screen_width:
+		ball.center = (screen_width/2, screen_height/2)
+		y_ball_speed *= -1
+		x_speed *= -1
+		paddle2_score += 1
+	
+	######ball collision with paddle######
+	if ball.colliderect(paddle1) or ball.colliderect(paddle2):
+		x_speed *= -1
 
 
 def PongGame():
@@ -45,28 +68,7 @@ def PongGame():
 	x_speed = 7
 	y_ball_speed = 7
 
-	def ballmovement():
-	global paddle1_score, paddle2_score, ball, paddle1, paddle2
-		ball.x += 7
-		ball.y += 7
-	
-	######ball bounce#######
-		if ball.top <= 0 or ball.bottom >= screen_height:
-			y_ball_speed *= -1
-		if ball.left <= 0:
-			ball.center = (screen_width/2, screen_height/2)
-			y_ball_speed *= -1
-			x_speed *= -1
-			paddle1_score += 1
-		if ball.right >= screen_width:
-			ball.center = (screen_width/2, screen_height/2)
-			y_ball_speed *= -1
-			x_speed *= -1
-			paddle2_score += 1
-	
-	######ball collision with paddle######
-	if ball.colliderect(paddle1) or ball.colliderect(paddle2):
-		x_speed *= -1
+#	def ballmovement():
 
 
 	
@@ -84,6 +86,7 @@ def PongGame():
 	running = True
 	start_screen = True
 	while True:
+		#global paddle1_score, paddle2_score, ball, paddle1, paddle2, x_speed, y_ball_speed		
 		while start_screen:
 			for event in pygame.event.get():
 				if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
