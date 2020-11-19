@@ -6,7 +6,7 @@ import flappy_bird
 import space_invaders
 import pygamepong
 import snake
-#import snake
+import hashlib
 
 #Keep libraries in game code (don't need to add it here)
 #comment out sys.exit() in game code (if present), add return value
@@ -76,6 +76,9 @@ while True:
                 Username = values.get('Username')
                 Pass = values.get('Password')
 
+                # Attempt to hash password
+                #Pass = hashlib.sha256(Username+Pass)
+
                 sql_login_query = cursor.execute("SELECT DISTINCT username,password FROM user WHERE user.username = ? AND user.password = ?", (Username,Pass))
                 rows = cursor.fetchall()
                 conn.commit() # finalize and end transaction with database
@@ -120,6 +123,10 @@ while True:
             try:
                 User = values.get('User')
                 Pass = values.get('Password')
+
+                # Attempt to hash password
+                #Pass = hashlib.sha256(Username+Pass)
+
                 sql_check_username_query = cursor.execute("SELECT username COLLATE NOCASE FROM user"); # Retrieve username to lowercase
                 rows = cursor.fetchall()
                 conn.commit() # finalize and end transaction with database
@@ -130,9 +137,7 @@ while True:
 
                 print("Username available!")
                 # Username is available if we have gotten here
-                sql_signup_query = cursor.execute("INSERT OR IGNORE INTO user(username, password) VALUES(?,?);", (User, Pass,))
-                print("Added username: ", User, "\t with password: ", Pass)
-                conn.commit() # finalize transaction
+                successful_info = True
 
             except Error as error:
                 print("sql_signup_query failed to fetch record.", error)
@@ -200,7 +205,7 @@ while True:
     
     if event == 'Sign In':
        
-        signin_layout = [[sg.Text("Username\t"), sg.InputText('', key='Username')],
+        signin_layout = [[sg.Text("Username"), sg.InputText('', key='Username')],
             [sg.Text('Password\t'), sg.InputText('', key='Password', password_char='*')],
             [sg.OK("Finish Sign In", button_color=('dark grey', 'dark violet')), 
             sg.OK("Back", button_color=('dark grey', 'dark violet')),
@@ -216,7 +221,7 @@ while True:
     elif event == 'Sign Up':
         print("sign up here")
 
-        signup_layout = [[sg.Text("Username\t"), sg.InputText('', key='Username')],
+        signup_layout = [[sg.Text("Username"), sg.InputText('', key='Username')],
                     [sg.Text('Password\t'), sg.InputText('', key='Password', password_char='*')], 
                     [sg.OK("Complete Sign Up", button_color=('dark grey', 'dark violet')), 
                     sg.OK("Back", button_color=('dark grey', 'dark violet')),
@@ -257,7 +262,10 @@ while True:
                 sg.popup_ok('Please enter information into ALL fields.')
             elif unsuccessful_info:
                 sg.popup_ok('INFO INVALID. Please enter again.')
-
+            elif successful_info:
+                sql_signup_query = cursor.execute("INSERT OR IGNORE INTO user(username, password) VALUES(?,?);", (User, Pass,))
+                print("Added username: ", User, "\t with password: ", Pass)
+                conn.commit() # finalize transaction
         #CHECK FOR COMPLETE FIELDS FOR SIGN IN
         else:
             #loop to check if info was entered into every field
