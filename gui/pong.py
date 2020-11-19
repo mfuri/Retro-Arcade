@@ -3,33 +3,26 @@
 import turtle   # built in no need to install
 
 start = False
+playername = "Seth"
+def StartMenu():
+    screen = turtle.Screen()
+    startmenu = turtle.Turtle()
+    screen.bgcolor("black")
+    startmenu.hideturtle()
+    startmenu.penup()
+    startmenu.write("Press SPACE to start", align="center", font=("Courier", 36, "normal"))
 
-#def StartMenu():
-   # win = turtle.Screen()
-   # win.title("Start Menu")
-   # win.bgcolor("black")
-   # win.setup(width = 1200, height = 1000)
-
-   # win.tracer(0)
-   # pen = turtle.Turtle()
-   # pen.speed(0)
-   # pen.color("white")
-   # pen.penup()
-   # pen.setposition(0,320)
-   # pen.pendown()
-   # pen.write("Press Space to start or Esc to exit", align="center",
-#	      font=("Courier", 36, "normal"))
-
-   # win.listen()
-   # win.onkeypress(win.bye, "Escape")
-   # win.onkeypress(PongGame(), "space")
-   # win.list()
+    screen.onkey(PongGame, 'space')
+    screen.onkey(screen.bye, 'Escape')
+    screen.listen()
+    screen.mainloop()
 
 # main loop
 def PongGame():
+#    StartMenu()
+#   startmenu.clear()
     global start
-    startmenu.clear()
-    start = true 
+    start = True 
 
     wn = turtle.Screen()
     wn.title("Pong Game")
@@ -111,7 +104,7 @@ def PongGame():
     wn.onkeypress(pad2_up, "Up")
     wn.onkeypress(pad2_down, "Down")
 
-    while True:
+    while start:
         wn.update()
 
         # ### ball movement ####
@@ -161,16 +154,30 @@ def PongGame():
             ball.dx *= -1
 
         if score1 == 10 or score2 == 10:
-            # end game
+            wn.reset()
+	#creat new pen since we called reset
+            pen = turtle.Turtle()
+            pen.speed(0)
+            pen.color("white")
+            pen.penup()
+            pen.hideturtle()
+            pen.goto(0, 320)
             # score 1 means computer won
             # score 2 means player won
             score1 *= 10
             score2 *= 10
+            if score1 < score2:
+                pen.write("{}, you won!".format(playername), align = "center",
+                          font=("Courier", 36, "normal"))
+            else:
+                pen.write("Game Over, You Lose", align = "center",
+                          font =("Courier", 36, "normal"))
             final_score = score2 - score1
             if final_score < 0:
                 final_score = 0
 
 
+StartMenu()
     screen = turtle.Screen()
     startmenu = turtle.Turtle()
     startmenu.hideturtle()

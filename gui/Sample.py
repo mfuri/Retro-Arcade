@@ -4,7 +4,7 @@ from sqlite3 import Error
 import importlib
 import flappy_bird
 import space_invaders
-import pong
+import pygamepong
 import snake
 import hashlib
 
