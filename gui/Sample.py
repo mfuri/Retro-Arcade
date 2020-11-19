@@ -123,6 +123,10 @@ while True:
             try:
                 User = values.get('User')
                 Pass = values.get('Password')
+
+                # Attempt to hash password
+                #Pass = hashlib.sha256(Username+Pass)
+
                 sql_check_username_query = cursor.execute("SELECT username COLLATE NOCASE FROM user"); # Retrieve username to lowercase
                 rows = cursor.fetchall()
                 conn.commit() # finalize and end transaction with database
