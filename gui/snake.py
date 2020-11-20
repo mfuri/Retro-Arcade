@@ -3,6 +3,7 @@ import sys
 import time
 import random
 from pygame.locals import *
+#environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 
 def Snake():
     FPS = 10
@@ -89,21 +90,19 @@ def Snake():
             apple.randomize()
 
 
-    if __name__ == '__main__':
-        player = Snake()
-        goal = Apple()
-        while True:
-
-            for event in pygame.event.get():
-                if event.type == KEYDOWN:
-                    if event.key == K_UP:
-                        player.point(UP)
-                    elif event.key == K_DOWN:
-                        player.point(DOWN)
-                    elif event.key == K_LEFT:
-                        player.point(LEFT)
-                    elif event.key == K_RIGHT:
-                        player.point(RIGHT)
+    player = Snake()
+    goal = Apple()
+    while True:
+        for event in pygame.event.get():
+            if event.type == KEYDOWN:
+                if event.key == K_UP:
+                    player.point(UP)
+                elif event.key == K_DOWN:
+                    player.point(DOWN)
+                elif event.key == K_LEFT:
+                    player.point(LEFT)
+                elif event.key == K_RIGHT:
+                    player.point(RIGHT)
                 if event.type == QUIT:
                     pygame.quit()
                     sys.exit()
