@@ -2,38 +2,22 @@ import hashlib
 import cryptography
 import sqlite3
 from sqlite3 import Error
-
+import os
+from os import environ, path
+from os.path import dirname, abspath, join
+environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 import PySimpleGUI as sg
+import pong
+import flappy_bird
+import space_invaders
+import snake
 
-from gui import flappy_bird
-from gui import pong
-from gui import snake
-from gui import space_invaders
+
+
 
 # Keep libraries in game code (don't need to add it here)
 # comment out sys.exit() in game code (if present), add return value
 # LAST STEP: MAKE IT ACTUALLY LOOK NICE
-
-sg.theme('Dark Purple 4')
-sg.SetOptions(input_text_color='white')
-
-main_layout = [[sg.Button("Sign Up", button_color=('dark grey', 'dark violet')),
-                sg.Button("Sign In", button_color=('dark grey', 'dark violet')),
-                sg.Button("Exit", button_color=('dark grey', 'dark violet'))],
-               [sg.Image("1.png")]]
-
-# connect to db
-try:
-    conn = sqlite3.connect('retro-arcade.db')
-    cursor = conn.cursor()
-    print("Connected to the SQLite3 database.")
-
-except Error as error:
-    print("Error connecting to the database.")
-
-# Create the Main Window
-main_window = sg.Window('RETRO ARCADE', main_layout, size=(852, 480))
-
 # booleans to display correct window
 main_window_hidden = False
 signup_window_hidden = False
@@ -50,9 +34,48 @@ user_logged_in = False
 # User Sign up # signup_success = False
 
 # Event Loop to process "events"
-while True:
+conn = None
+cursor = None
+events = None
+signin_window = None
+signup_window = None
+games_window = None
 
-    print("running")
+
+ROOT_DIR = dirname(dirname(abspath(__file__)))
+
+
+sg.theme('Dark Purple 4')
+sg.SetOptions(input_text_color='white')
+
+main_layout = [[sg.Button("Sign Up", button_color=('dark grey', 'dark violet')),
+                sg.Button("Sign In", button_color=('dark grey', 'dark violet')),
+                sg.Button("Exit", button_color=('dark grey', 'dark violet'))],
+               [sg.Image('1.png')]]
+
+
+print("[Startup] Please wait: Retro-Arcade is initializing...")
+print("[Startup] PROJECT ROOT DIR: ", ROOT_DIR)
+
+# connect to db
+try:
+    conn = sqlite3.connect(join(ROOT_DIR, 'highscores/retro-arcade.db'))
+    cursor = conn.cursor()
+    print("[SQLite] Successfully connected to the database.")
+
+except Error as error:
+    print("[SQLite] Failed to connect to the database. Error: ", error)
+
+# Create the Main Window
+main_window = sg.Window('RETRO ARCADE', main_layout, size=(852, 480))
+
+count = 0
+while True:
+    count = count + 1
+    if count == 1:
+        print("[System] Inside \'while True\' loop. Execution count = ", count)
+    else:
+        print("[System] Returned to \'while True\' loop. Execution count = ", count)
 
     if not main_window_hidden:
         event, values = main_window.read()
@@ -90,26 +113,20 @@ while True:
 
                 num_rows = len(rows)
                 if (num_rows < 0):
-                    print("Username/Password combination not found in the database.")
+                    print("[SQLite] Username/Password combination not found in the database.")
                     events, value = signin_window.read()
-                    # unsuccessful_info = True
-                    # Rather than re-executing query, maybe have user try again? I assume that's what you meant -ABL
                 elif (num_rows == 1):
-                    print("Login successful.")  # -> if valid, open games_window
+                    print("[SQLite] Login successful.")  # -> if valid, open games_window
                     successful_info = True
-                    # games_window_open.open()
                 elif (num_rows > 1):
-                    print("Duplicate record(s) found.")
+                    print("[SQLite] Duplicate record(s) found.")
                 else:
-                    print("Unknown failure fetching username & password.")
+                    print("[SQLite] Unknown failure fetching username & password.")
                     unsuccessful_info = True
 
             except Error as error:
-                print("sql_login_query failed to fetch record.", error)
+                print("[SQLite] login query failed to fetch record. Error: ", error)
                 break
-                # unsuccessful_info = True
-            finally:
-                print("sql_login_query executed successfully.")
                 # unsuccessful_info = True
 
             # here connect to db -> steps:
@@ -132,25 +149,22 @@ while True:
                 # Attempt to hash password
                 # Pass = hashlib.sha256(Username+Pass)
 
-                sql_check_username_query = cursor.execute(
-                    "SELECT username COLLATE NOCASE FROM user;")  # Retrieve username to lowercase
+                sql_check_available = cursor.execute(
+                    "SELECT username COLLATE NOCASE FROM user")  # Retrieve username to lowercase
                 rows = cursor.fetchall()
-                conn.commit()  # finalize and end transaction with database
 
                 for element in rows:
                     if User == element:
-                        print("Username found in database. Please try another.")
+                        print("[SQLite] Username found in database. Please try another.")
+                        break
 
-                print("Username available!")
-                # Username is available if we have gotten here
+                print("[SQLite] Username is available!")
                 successful_info = True
-
+                conn.commit()  # finalize and end transaction with database
+                print("[SQLite] Signup succeeded")
             except Error as error:
-                print("sql_signup_query failed to fetch record.", error)
+                print("[SQLite] Signup query failed to fetch record. Error: ", error)
                 break
-                # unsuccessful_info = True
-            finally:
-                print("sql_signup_query executed successfully.")
                 # unsuccessful_info = True
 
             # here is where we will access the db -> steps:
@@ -172,7 +186,7 @@ while True:
             print("Thanks for playing Flappy Bird! Score: ", score)
 
             if (score < 0):
-                print("Point value must be nonnegative.")
+                print("[SQLite] Flappy Bird Insertion Error...Point value must be nonnegative.")
             #Username = values.get('Username')
 
             sql_flappy_query = cursor.execute("""INSERT INTO flappy(username,score,time,date)
@@ -224,7 +238,7 @@ while True:
                          [sg.Text('Password\t'), sg.InputText('', key='Password', password_char='*')],
                          [sg.OK("Finish Sign In", button_color=('dark grey', 'dark violet')),
                           sg.OK("Back", button_color=('dark grey', 'dark violet')),
-                          sg.Cancel("Exit", button_color=('dark grey', 'dark violet'))], [sg.Image("1.png")]]
+                          sg.Cancel("Exit", button_color=('dark grey', 'dark violet'))], [sg.Image("./1.png")]]
 
         # creates/opens sign in window
         signin_window = sg.Window('RETRO ARCADE', signin_layout, size=(852, 480))
@@ -248,7 +262,6 @@ while True:
         signup_window_open = True
         main_window.hide()
         main_window_hidden = True
-
 
     elif event == 'Back':
         # returns to main window
@@ -280,7 +293,7 @@ while True:
             elif successful_info:
                 sql_signup_query = cursor.execute("INSERT OR IGNORE INTO user(username, password) VALUES(?,?);",
                                                   (User, Pass,))
-                print("Added username: ", User, "\t with password: ", Pass)
+                print("[SQLite] Success: Added username: ", User, "\t with password: ", Pass)
                 conn.commit()  # finalize transaction
         # CHECK FOR COMPLETE FIELDS FOR SIGN IN
         else:
