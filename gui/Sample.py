@@ -180,11 +180,11 @@ while True:
         # DISPLAY GAMES
 
         if event == "Flappy Bird":
-            print("PLAY FLAPPY BIRD")
+            print("[GAME] PLAY FLAPPY BIRD")
             # RETURNS SCORE!!!
             score = flappy_bird.Flappy_Game()
 
-            print("Thanks for playing Flappy Bird! Score: ", score)
+            print("[GAME] Thanks for playing Flappy Bird! Score: ", score)
 
             if score is None:
                 print("[SQLite] Flappy Bird Insertion Error...Point value must be > 0.")
@@ -193,34 +193,32 @@ while True:
                 print("[SQLite] Flappy Bird Insertion Error...Username is null. ")
                 break
             else:
-                time = time.time()
-                date = datetime.datetime.now()
-                sql_flappy_query = cursor.execute("""INSERT INTO flappy(username,score,time,date)
-                                              VALUES (?, ?,  ?, ?)""", (User, score, time, date))
+                sql_flappy_query = cursor.execute("""INSERT INTO flappy(username,score,datetime)
+                                              VALUES (?, ?, ?)""", (User, score, datetime.datetime.now()))
                 conn.commit()  # finalize and end transaction with database
                 print("[SQLite] Flappy Bird HS added successfully.")
 
         elif event == "Pong":
-            print("PLAY PONG")
+            print("[GAME] PLAY PONG")
             pong.PongGame()
 
         elif event == "Space Invaders":
-            print("PLAY SPACE INVADERS")
+            print("[GAME] PLAY SPACE INVADERS")
             # RETURNS SCORE!!!
             score = space_invaders.SI_Game()
             print(score)
 
         elif event == "Snake":
-            print("PLAY SNAKE")
+            print("[GAME] PLAY SNAKE")
             snake.Snake()
 
         elif event == 'My Stats':
-            print("VIEW STATS")
+            print("[USER] VIEW STATS")
             # pull from db and print out in pop-up window
             sg.popup("My Stats")
 
         elif event == 'High Scores':
-            print("High scores")
+            print("[USER] High scores")
             sg.popup("High Scores")
             # pull from db and print out in pop-up window
 
