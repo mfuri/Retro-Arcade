@@ -2,27 +2,29 @@ import pygame
 import sys
 import time
 import random
-from pygame.locals import *
+import pygame.locals
 #environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 
 def Snake():
     FPS = 10
     pygame.init()
     fpsClock = pygame.time.Clock()
-
+    red = (255, 0, 0)
+    green = (99, 255, 32)
     SCREEN_WIDTH = 500
     SCREEN_HEIGHT = 500
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), 0, 32)
     surface = pygame.Surface(screen.get_size())
     surface = surface.convert()
-    surface.fill((255, 255, 255))
+    black = (0,0,0)
+    white = (255,255,255)
     clock = pygame.time.Clock()
-
     pygame.key.set_repeat(1, 40)
-
     GRIDSIZE = 10
     GRID_WIDTH = SCREEN_WIDTH / GRIDSIZE
     GRID_HEIGHT = SCREEN_HEIGHT / GRIDSIZE
+    #runningSound = pygame.mixer.sound("assets/sounds/sample.wav")
+    #deathSound = pygame.mixer.sound("assets/sounds/sample2.wav")
     UP = (0, -1)
     DOWN = (0, 1)
     LEFT = (-1, 0)
@@ -35,11 +37,19 @@ def Snake():
         r = pygame.Rect((pos[0], pos[1]), (GRIDSIZE, GRIDSIZE))
         pygame.draw.rect(surf, color, r)
 
+    def startScreen():
+        font = pygame.font.Font(None, 36)
+        text = font.render("Press Space to Start", True, (255,255,255))
+        window = font.render("Press Space to Start (Q or ESC to Quit)", True, (0, 0, 0))
+        tRect = text.get_rect(center=((SCREEN_WIDTH / 2), (SCREEN_HEIGHT / 2) - 110))
+        oect = window.get_rect(center=((SCREEN_WIDTH / 2) + 2, (SCREEN_HEIGHT / 2) - 108))
+        screen.blit(window, oect)
+        screen.blit(text, oect)
 
     class Snake(object):
         def __init__(self):
             self.lose()
-            self.color = (99, 255, 32)
+            self.color = (green)
 
         def get_head_position(self):
             return self.positions[0]
@@ -74,7 +84,7 @@ def Snake():
     class Apple(object):
         def __init__(self):
             self.position = (0, 0)
-            self.color = (255, 0, 0)
+            self.color = (red)
             self.randomize()
 
         def draw(self, surf):
@@ -107,18 +117,17 @@ def Snake():
                     pygame.quit()
                     sys.exit()
 
-            surface.fill((0, 0, 0))
+            surface.fill(black)
             player.move()
             check_eat(player, goal)
             player.draw(surface)
             goal.draw(surface)
             font = pygame.font.Font(None, 36)
-            text = font.render(str(player.length), 1, (255, 255, 255))
+            text = font.render(str(player.length), 1, (white))
             textpos = text.get_rect()
             textpos.centerx = 450
             surface.blit(text, textpos)
             screen.blit(surface, (0, 0))
-
             pygame.display.flip()
             pygame.display.update()
             fpsClock.tick(FPS)
