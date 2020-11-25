@@ -184,7 +184,8 @@ while True:
 
         elif event == "Pong":
             print("[GAME] PLAY PONG")
-            pygamepong.PongGame()
+            #returns score
+            pong_score = pygamepong.PongGame()
 
         elif event == "Space Invaders":
             print("[GAME] PLAY SPACE INVADERS")
