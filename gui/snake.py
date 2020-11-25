@@ -3,6 +3,7 @@ import sys
 import time
 import random
 import pygame.locals
+from pygame.locals import *
 #environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 
 def Snake():
@@ -99,7 +100,6 @@ def Snake():
             snake.length = snake.length + 1
             apple.randomize()
 
-
     player = Snake()
     goal = Apple()
     while True:
@@ -113,9 +113,10 @@ def Snake():
                     player.point(LEFT)
                 elif event.key == K_RIGHT:
                     player.point(RIGHT)
-                if event.type == QUIT:
+                if event.type == QUIT or (event.type == KEYDOWN and (event.key == K_ESCAPE or event.key == K_q)):
                     pygame.quit()
-                    sys.exit()
+                    print(player.length)
+                    return player.length
 
             surface.fill(black)
             player.move()
