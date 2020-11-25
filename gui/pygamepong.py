@@ -68,19 +68,19 @@ def PongGame():
 			start()
 			pygame.display.flip()
 				
-		for event in pygame.event.get():
-			if event.type == pygame.QUIT:
-				pygame.quit()
-			if event.type == pygame.KEYDOWN:
-				if event.key == pygame.K_DOWN:
-					player_speed += 7
-				if event.key == pygame.K_UP:
-					player_speed -= 7
-			if event.type == pygame.KEYUP:
-				if event.key == pygame.K_DOWN:
-					player_speed -= 7
-				if event.key == pygame.K_UP:
-					player_speed += 7		
+			for event in pygame.event.get():
+				if event.type == pygame.QUIT:
+					pygame.quit()
+				if event.type == pygame.KEYDOWN:
+					if event.key == pygame.K_DOWN:
+						player_speed += 7
+					if event.key == pygame.K_UP:
+						player_speed -= 7
+				if event.type == pygame.KEYUP:
+					if event.key == pygame.K_DOWN:
+						player_speed -= 7
+					if event.key == pygame.K_UP:
+						player_speed += 7		
 		#######object coloring#######
 		
 		screen.fill(bg_color)
@@ -140,4 +140,4 @@ def PongGame():
 			clock.tick(50)
 
 
-PongGame()
+#PongGame()
