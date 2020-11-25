@@ -5,7 +5,7 @@ from sqlite3 import Error
 
 environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 import PySimpleGUI as sg
-import pong
+import pygamepong
 import flappy_bird
 import space_invaders
 import snake
@@ -27,8 +27,6 @@ successful_info = False
 unsuccessful_info = False
 
 user_logged_in = False
-# User Login # login_success = False
-# User Sign up # signup_success = False
 
 User = None
 Pass = None
@@ -45,9 +43,9 @@ ROOT_DIR = dirname(dirname(abspath(__file__)))
 sg.theme('Dark Purple 4')
 sg.SetOptions(input_text_color='white')
 
-main_layout = [[sg.Button("Sign Up", button_color=('dark grey', 'dark violet')),
-                sg.Button("Sign In", button_color=('dark grey', 'dark violet')),
-                sg.Button("Exit", button_color=('dark grey', 'dark violet'))],
+main_layout = [[sg.Button("Sign Up", font=16, button_color=('dark grey', 'dark violet')),
+                sg.Button("Sign In", font=16, button_color=('dark grey', 'dark violet')),
+                sg.Button("Exit", font=16, button_color=('dark grey', 'dark violet'))],
                [sg.Image('1.png')]]
 
 print("[System] Please wait: Retro-Arcade is initializing...")
@@ -98,10 +96,6 @@ while True:
                 Username = values.get('Username')
                 Pass = values.get('Password')
 
-                # Attempt to hash password
-                # Pass =
-                # print(hashlib.sha256(Username+Pass))
-
                 sql_login_query = cursor.execute("SELECT DISTINCT username,password "
                                                  "FROM user WHERE user.username = ? "
                                                  "AND user.password = ?", (Username, Pass))
@@ -123,23 +117,20 @@ while True:
                 else:
                     print("[SQLite] Unknown failure fetching username & password.")
                     unsuccessful_info = True
-                    break
+                    #break
             except Error as error:
                 print("[SQLite] login query failed to fetch record. Error: ", error)
                 break
-                # unsuccessful_info = True
-
-            # here connect to db -> steps:
-            # prereq: ALL INFO FIELDS MUST HAVE TEXT
-            # 1. SELECT email, password FROM <user_info> WHERE email='<user_entry>' AND password='user_entry>';
-            # -> if valid, open games_window
-            # -> if invalid, popup with "INCORRECT INFO" Message, repeat 1
 
     elif signup_window_open:
         if final_sign_up:
             event = 'Sign Up'
             signup_window.close()
             final_sign_up = False
+        elif unsuccessful_info:
+            event = 'Sign Up'
+            signup_window.close()
+            unsuccessful_info = False
         else:
             event, values = signup_window.read()
             try:
@@ -154,26 +145,19 @@ while True:
                 rows = cursor.fetchall()
 
                 for element in rows:
-                    if User == element:
+                    if User == element[0]:
                         print("[SQLite] Username found in database. Please try another.")
+                        unsuccessful_info = True
                         break
 
-                print("[SQLite] Username is available!")
-                successful_info = True
-                conn.commit()  # finalize and end transaction with database
-                print("[SQLite] Signup succeeded")
+                if not unsuccessful_info:
+                    print("[SQLite] Username is available!")
+                    successful_info = True
+                    
             except Error as error:
                 print("[SQLite] Signup query failed to fetch record. Error: ", error)
                 break
-                # unsuccessful_info = True
-
-            # here is where we will access the db -> steps:
-            # prereq: ALL INFO FIELDS MUST HAVE TEXT
-            # 1. SELECT email FROM <user_info> WHERE email='<user_entry>';
-            # -> if email not found, proceed to account creation and sign in -> games_window opens
-            # ACCOUNT CREATION: INSERT INTO <user_info> VALUES (email, username, password);
-            # -> if email found, popup with "ALREADY HAVE ACCOUNT WITH THIS EMAIL" message
-
+               
     # NOTE: WHEN EXITING GAME, ENTIRE PROGRAM CLOSES -> FIX THIS
     elif games_window_open:
         event, values = games_window.read()
@@ -200,7 +184,7 @@ while True:
 
         elif event == "Pong":
             print("[GAME] PLAY PONG")
-            pong.PongGame()
+            pygamepong.PongGame()
 
         elif event == "Space Invaders":
             print("[GAME] PLAY SPACE INVADERS")
@@ -210,16 +194,46 @@ while True:
 
         elif event == "Snake":
             print("[GAME] PLAY SNAKE")
-            snake.Snake()
+            #returns score!
+            snake_score = snake.Snake()
+        
 
         elif event == 'My Stats':
             print("[USER] VIEW STATS")
             # pull from db and print out in pop-up window
-            sg.popup("My Stats")
+            sql_stats_query = cursor.execute("SELECT * FROM flappy WHERE username = ?", (User,))
+            output = cursor.fetchall()
+            conn.commit()
+            flappy_high_score = 0
+            for data in output:
+                if data[0] == User:
+                    if data[1] >= flappy_high_score:
+                        flappy_high_score = data[1]
+                        flappy_score_date = data[2]
+            if flappy_high_score == 0:
+                flappy_score_date = None
+
+            #create a string with all of the player's personal stats for each game
+            example_string = User + "'s High Scores\nFlappy Bird: " + str(flappy_high_score) + "\nSpace Invaders: 3\nPong: 3\nSnake: 17"
+            sg.popup(example_string, title = User + " personal stats", font=14)
+            #print out personal high scores, number of times played
 
         elif event == 'High Scores':
             print("[USER] High scores")
-            sg.popup("High Scores")
+            sql_stats_query = cursor.execute("SELECT * FROM flappy")
+            output = cursor.fetchall()
+            conn.commit()
+            #iterate through all data, or we could have a high scores
+            flappy_high_score = 0
+            for data in output:
+                if data[0] != '':
+                    if data[1] >= flappy_high_score:
+                        flappy_high_score = data[1]
+            if flappy_high_score == 0:
+                flappy_score_date = None
+            example_string = "High Scores\nFlappy Bird: " + str(flappy_high_score) + " (Username: " + data[0] + ")\nSpace Invaders: 3\nPong: 3\nSnake: 17"
+            sg.popup(example_string, title="Retro Arcade High Scores", font=14)
+        
             # pull from db and print out in pop-up window
 
         elif event == 'Sign Out':
@@ -234,15 +248,14 @@ while True:
             # sets login success to false until user signs in again
             unsuccessful_info = False
             successful_info = False
-    # print(event, values)
 
     if event == 'Sign In':
 
-        signin_layout = [[sg.Text("Username"), sg.InputText('', key='Username')],
-                         [sg.Text('Password\t'), sg.InputText('', key='Password', password_char='*')],
-                         [sg.OK("Finish Sign In", button_color=('dark grey', 'dark violet')),
-                          sg.OK("Back", button_color=('dark grey', 'dark violet')),
-                          sg.Cancel("Exit", button_color=('dark grey', 'dark violet'))], [sg.Image("./1.png")]]
+        signin_layout = [[sg.Text("Username", font=16), sg.InputText('', key='Username', font=16)],
+                         [sg.Text('Password  ', font=16), sg.InputText('', key='Password', password_char='*', font=16)],
+                         [sg.OK("Finish Sign In", button_color=('dark grey', 'dark violet'), font=16),
+                          sg.OK("Back", button_color=('dark grey', 'dark violet'), font=16),
+                          sg.Cancel("Exit", font=16, button_color=('dark grey', 'dark violet'))], [sg.Image("./1.png")]]
 
         # creates/opens sign in window
         signin_window = sg.Window('RETRO ARCADE', signin_layout, size=(852, 480))
@@ -254,11 +267,11 @@ while True:
     elif event == 'Sign Up':
         print("sign up here")
 
-        signup_layout = [[sg.Text("Username"), sg.InputText('', key='Username')],
-                         [sg.Text('Password\t'), sg.InputText('', key='Password', password_char='*')],
-                         [sg.OK("Complete Sign Up", button_color=('dark grey', 'dark violet')),
-                          sg.OK("Back", button_color=('dark grey', 'dark violet')),
-                          sg.Cancel("Exit", button_color=('dark grey', 'dark violet'))], [sg.Image("1.png")]]
+        signup_layout = [[sg.Text("Username", font=16), sg.InputText('', key='Username', font=16)],
+                         [sg.Text('Password  ', font=16), sg.InputText('', key='Password', password_char='*', font=16)],
+                         [sg.OK("Complete Sign Up", font=16, button_color=('dark grey', 'dark violet')),
+                          sg.OK("Back", font=16, button_color=('dark grey', 'dark violet')),
+                          sg.Cancel("Exit", font=16, button_color=('dark grey', 'dark violet'))], [sg.Image("1.png")]]
 
         # creates/opens sign up window
         signup_window = sg.Window('RETRO ARCADE', signup_layout, size=(852, 480))
@@ -291,9 +304,9 @@ while True:
                 if values[value] == '':
                     final_sign_up = True
             if final_sign_up:
-                sg.popup_ok('Please enter information into ALL fields.')
+                sg.popup_ok('Please enter information into ALL fields.', title = "Invalid Entry", font=14)
             elif unsuccessful_info:
-                sg.popup_ok('INFO INVALID. Please enter again.')
+                sg.popup_ok('Username already taken. Please enter another.', title = "Invalid Entry", font=14)
             elif successful_info:
                 sql_signup_query = cursor.execute("INSERT OR IGNORE INTO user(username, password) VALUES(?,?);",
                                                   (User, Pass,))
@@ -308,11 +321,12 @@ while True:
 
             # pop up if user does not enter info into every field
             if final_sign_in:
-                sg.popup_ok('Please enter both your username and password.')
+                sg.popup_ok('Please enter both your username and password.', font=14)
 
             # pop up if user enters invalid info
             elif unsuccessful_info:
-                sg.popup_ok('Information entered invalid. Please try again.')
+                sg.popup_ok('Information entered invalid. Please try again.', font=14)
+                
 
         # if all fields have been filled in -> still have to check if info provided is valid
         # could have another bool that we set to true only when user info has been confirmed
@@ -325,14 +339,15 @@ while True:
                 signup_window.close()
                 signup_window_open = False
 
-            games_layout = [[sg.Button("My Stats", button_color=('dark grey', 'dark violet')),
-                             sg.Button("High Scores", button_color=('dark grey', 'dark violet')),
-                             sg.Button("Sign Out", button_color=('dark grey', 'dark violet')),
-                             sg.Cancel("Exit", button_color=('dark grey', 'dark violet'))],
-                            [sg.Button("Flappy Bird", button_color=('dark grey', 'dark violet')),
-                             sg.Button("Pong", button_color=('dark grey', 'dark violet'))],
-                            [sg.Button("Snake", button_color=('dark grey', 'dark violet')),
-                             sg.Button("Space Invaders", button_color=('dark grey', 'dark violet'))],
+            games_layout = [[sg.Text("Welcome to Retro Arcade " + User, font=20)],
+                            [sg.Button("My Stats", font=16, button_color=('dark grey', 'dark violet')),
+                             sg.Button("High Scores", font=16, button_color=('dark grey', 'dark violet')),
+                             sg.Button("Sign Out", font=16, button_color=('dark grey', 'dark violet')),
+                             sg.Cancel("Exit", font=16, button_color=('dark grey', 'dark violet'))],
+                            [sg.Button("Flappy Bird", font=16,button_color=('dark grey', 'dark violet')),
+                             sg.Button("Pong", font=16, button_color=('dark grey', 'dark violet'))],
+                            [sg.Button("Snake", font=16, button_color=('dark grey', 'dark violet')),
+                             sg.Button("Space Invaders", font=16, button_color=('dark grey', 'dark violet'))],
                             [sg.Image("1.png")]]
 
             # creates/opens game display window
