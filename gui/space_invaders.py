@@ -218,7 +218,8 @@ def SI_Game():
     running = True
     start_screen = True
     move_value = 1
-    level = 0   
+    level = 0
+    old_level = 0 
     highest_score = 0
     while True:
         while start_screen:
@@ -269,7 +270,7 @@ def SI_Game():
             #Checks if lost
             #ship.check_alive(aliens)
             if (ship.alive == False):
-                print("You Lose on Level: " + str(level))
+                print("You Lose on Level: " + str(level+1))
 
             if len(aliens) == 0:
                 next_level = True
@@ -278,9 +279,15 @@ def SI_Game():
                     for event in pygame.event.get():
                         if event.type == pygame.QUIT or (event.type == KEYDOWN and (event.key == K_ESCAPE or event.key == K_q)):
                             pygame.quit()
-                            return level
+                            if (old_level >= level):
+                                return old_level
+                            else:
+                                return level
                             #sys.exit()
                         elif event.type == KEYDOWN and event.key == K_SPACE:
+                            if (old_level <= level):
+                                old_level = level
+                            level = 0
                             next_level = False
                     continue_overlay(level)
                     pygame.display.flip()
