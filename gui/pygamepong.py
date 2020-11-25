@@ -1,12 +1,9 @@
 
 
 import pygame
+from pygame.locals import *
 #Seth Polen
 #switched because turtle wasn't very intuitive with start screen
-
-
-
-
 
 def PongGame():
 	pygame.init()
@@ -28,10 +25,7 @@ def PongGame():
 	player_speed = 0
 	AI_Speed = 6.25
 
-
 	thefont = pygame.font.Font(None, 36)
-
-
 
 	bg_color = pygame.Color(0,0,0)
 	paddlecolor = (255, 255, 255)
@@ -41,17 +35,12 @@ def PongGame():
 	x_speed = 7
 	y_ball_speed = 7
 
-
-
-	
 	#######startmenu #######
 	def start():
 		# will use thefont
 		start_text = thefont.render("Press Space to Start (ESC to Quit)", True, (255, 255, 255))
 		start_rect = start_text.get_rect(center = ((screen_width/2), (screen_height/2)))
 		screen.blit(start_text, start_rect)
-
-
 
 	######### Main Loop #########
 
@@ -68,19 +57,20 @@ def PongGame():
 			start()
 			pygame.display.flip()
 				
-			for event in pygame.event.get():
-				if event.type == pygame.QUIT:
-					pygame.quit()
-				if event.type == pygame.KEYDOWN:
-					if event.key == pygame.K_DOWN:
-						player_speed += 7
-					if event.key == pygame.K_UP:
-						player_speed -= 7
-				if event.type == pygame.KEYUP:
-					if event.key == pygame.K_DOWN:
-						player_speed -= 7
-					if event.key == pygame.K_UP:
-						player_speed += 7		
+		for event in pygame.event.get():
+			if event.type == pygame.QUIT or (event.type == KEYDOWN and (event.key == K_ESCAPE or event.key == K_q)):
+				pygame.quit()
+				return paddle1_score
+			if event.type == pygame.KEYDOWN:
+				if event.key == pygame.K_DOWN:
+					player_speed += 7
+				if event.key == pygame.K_UP:
+					player_speed -= 7
+			if event.type == pygame.KEYUP:
+				if event.key == pygame.K_DOWN:
+					player_speed -= 7
+				if event.key == pygame.K_UP:
+					player_speed += 7		
 		#######object coloring#######
 		
 		screen.fill(bg_color)
