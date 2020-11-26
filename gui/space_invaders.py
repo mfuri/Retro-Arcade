@@ -150,7 +150,6 @@ def SI_Game():
                             #Value Error here
                             alien_list.remove(alien)
                             rocket.kill()
-                            print(i)
                             self.level_list.remove(self.level_list[i])
                     i += 1
         def screen_collision(self, alien_list):
@@ -210,9 +209,6 @@ def SI_Game():
     #aliens move every 1.5 seconds
     pygame.time.set_timer(MOVEALIENS, time)
 
-
-
-
     rocket_list = pygame.sprite.Group()
 
     running = True
@@ -221,6 +217,7 @@ def SI_Game():
     level = 0
     old_level = 0 
     highest_score = 0
+
     while True:
         while start_screen:
             for event in pygame.event.get():
@@ -251,7 +248,8 @@ def SI_Game():
             for event in pygame.event.get():
                 if event.type == pygame.QUIT or (event.type == KEYDOWN and (event.key == K_ESCAPE or event.key == K_q)):
                     pygame.quit()
-                    return level
+                    if level + 1 >= highest_score:
+                        return highest_score
                     #sys.exit()
                 elif event.type == KEYDOWN and event.key == K_SPACE:
                     rocket = Rocket(ship.rect.x+11, ship.rect.y)
@@ -275,6 +273,8 @@ def SI_Game():
             if len(aliens) == 0:
                 next_level = True
                 level += 1
+                if level >= highest_score:
+                    highest_score = level
                 while next_level:
                     for event in pygame.event.get():
                         if event.type == pygame.QUIT or (event.type == KEYDOWN and (event.key == K_ESCAPE or event.key == K_q)):
@@ -287,11 +287,9 @@ def SI_Game():
                         elif event.type == KEYDOWN and event.key == K_SPACE:
                             if (old_level <= level):
                                 old_level = level
-                            level = 0
                             next_level = False
                     continue_overlay(level)
                     pygame.display.flip()
-                print("NEXT LEVEL")
                 move_value += 4
                 alien.create_alien_list(aliens)
                 rocket_list.empty()
