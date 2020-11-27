@@ -175,6 +175,15 @@ def SI_Game():
             screen.blit(level_text, level_rect)
         screen.blit(continue_text,continue_rect)
 
+    def lose_overlay(level):
+        lose_font = pygame.font.Font('assets/fonts/A-Space.otf', 18)
+        lose_text = lose_font.render("You Lose", True, (255,255,255))
+        lose_rect = lose_text.get_rect(center = ((SCREEN_WIDTH / 2), (SCREEN_HEIGHT / 2)-20))
+        if (level > 0):
+            level_text = lose_font.render("You lost at level " + str(level) + ".", True, (255,255,255))
+            level_rect = level_text.get_rect(center = ((SCREEN_WIDTH / 2), (SCREEN_HEIGHT / 2)+20))
+            screen.blit(level_text, level_rect)
+        screen.blit(lose_text,lose_rect)
     screen = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))
 
     bg = Background(SCREEN_WIDTH,SCREEN_HEIGHT)
@@ -197,9 +206,9 @@ def SI_Game():
     pygame.display.flip()
 
     #Create List of Aliens
-    alien = Alien()
-    aliens = []
-    alien.create_alien_list(aliens)
+    # alien = Alien()
+    # aliens = []
+    # alien.create_alien_list(aliens)
 
     #Create list of rockets
     rockets = []
@@ -219,6 +228,9 @@ def SI_Game():
     highest_score = 0
 
     while True:
+        alien = Alien()
+        aliens = []
+        alien.create_alien_list(aliens)
         while start_screen:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT or (event.type == KEYDOWN and (event.key == K_ESCAPE or event.key == K_q)):
@@ -228,6 +240,8 @@ def SI_Game():
                 elif event.type == KEYDOWN and event.key == K_SPACE:
                     level = 0
                     start_screen = False
+                    running = True
+                    move_value = 1
                 elif event.type == KEYDOWN and (event.key != K_SPACE or event.key != K_ESCAPE or event.key != K_q):
                     pygame.mixer.Sound.play(error_sound)
                     #Will play error sound when invaid key is pressed
@@ -249,7 +263,7 @@ def SI_Game():
                 if event.type == pygame.QUIT or (event.type == KEYDOWN and (event.key == K_ESCAPE or event.key == K_q)):
                     pygame.quit()
                     if level + 1 >= highest_score:
-                        return highest_score
+                        return level + 1
                     #sys.exit()
                 elif event.type == KEYDOWN and event.key == K_SPACE:
                     rocket = Rocket(ship.rect.x+11, ship.rect.y)
@@ -267,8 +281,11 @@ def SI_Game():
 
             #Checks if lost
             #ship.check_alive(aliens)
-            if (ship.alive == False):
+            if (running == False):
                 print("You Lose on Level: " + str(level+1))
+                if level >= highest_score:
+                    highest_score = level
+                lose_screen = True
 
             if len(aliens) == 0:
                 next_level = True
@@ -301,4 +318,20 @@ def SI_Game():
             if keys[pygame.K_LEFT]:
                 ship.move_left()
             if keys[pygame.K_RIGHT]:
-                ship.move_right()            
+                ship.move_right()    
+        while lose_screen:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT or (event.type == KEYDOWN and (event.key == K_ESCAPE or event.key == K_q)):
+                    pygame.quit()
+                    return highest_score
+                    #sys.exit()
+                elif event.type == KEYDOWN and event.key == K_SPACE:
+                    level = 0
+                    start_screen = True
+                    lose_screen = False
+                elif event.type == KEYDOWN and (event.key != K_SPACE or event.key != K_ESCAPE or event.key != K_q):
+                    pygame.mixer.Sound.play(error_sound)
+                    #Will play error sound when invaid key is pressed
+            screen.fill((0,0,0))
+            lose_overlay(level+1)
+            pygame.display.flip()        
