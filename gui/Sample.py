@@ -1,4 +1,6 @@
+import base64
 import sqlite3
+from cryptography.fernet import Fernet
 from os import environ
 from os.path import dirname, abspath, join
 from sqlite3 import Error
@@ -11,6 +13,17 @@ import space_invaders
 import snake
 import datetime as datetime
 import time as time
+
+
+# Encryption
+key = Fernet.generate_key()
+cipher_suite = Fernet(key)
+conn = None
+cursor = None
+
+
+
+
 
 # Keep libraries in game code (don't need to add it here)
 # comment out sys.exit() in game code (if present), add return value
@@ -26,12 +39,8 @@ final_sign_up = False
 successful_info = False
 unsuccessful_info = False
 
-user_logged_in = False
 
-User = None
-Pass = None
-conn = None
-cursor = None
+
 event = None  # Event Loop to process "events"
 values = None
 signin_window = None
@@ -48,6 +57,7 @@ main_layout = [[sg.Button("Sign Up", font=16, button_color=('dark grey', 'dark v
                 sg.Button("Exit", font=16, button_color=('dark grey', 'dark violet'))],
                [sg.Image('1.png')]]
 
+
 print("[System] Please wait: Retro-Arcade is initializing...")
 print("[System] PROJECT ROOT DIR: ", ROOT_DIR)
 
@@ -60,9 +70,45 @@ try:
 except Error as error:
     print("[SQLite] Failed to connect to the database. Error: ", error)
 
+
+class Player:
+    _User = "None"
+    _Pass = ""
+    _is_logged_in = False
+
+    def get_username(self):
+        return self._User
+
+    def get_password(self):
+        return self._Pass
+
+    def get_login_status(self):
+        return self._is_logged_in
+
+    def set_username(self, set_string):
+        self._User = set_string
+
+    def set_password(self, set_string):
+        self._Pass = set_string
+
+    def set_login_status(self, set_bool):
+        if self._is_logged_in and set_bool == "False" or set_bool == 0:
+            self._is_logged_in = False
+        elif not self._is_logged_in and set_bool == "True" or set_bool == 1:
+            self._is_logged_in = True
+        else:
+            self._is_logged_in = False
+
+def encrypt(pwd):
+    print("Plain Password: ", pwd)
+    pwd_ascii = pwd.encode("ascii")  # set encoding to ascii
+    pwd_bytes = base64.b64encode(pwd_ascii)  # convert password to bytes
+    encrypted_password = cipher_suite.encrypt(pwd_bytes)  # Encrypt with AES
+    print("Encrypted Password: ", encrypted_password)
+    return encrypted_password
 # Create the Main Window
 main_window = sg.Window('RETRO ARCADE', main_layout, size=(852, 480))
-
+player = Player()
 count = 0
 while True:
     count = count + 1
@@ -93,12 +139,14 @@ while True:
             event, values = signin_window.read()
 
             try:
-                Username = values.get('Username')
-                Pass = values.get('Password')
+                User = values.get('Username')
+                Pass = encrypt(values.get('Password'))
+
+                print(player.get_password())
 
                 sql_login_query = cursor.execute("SELECT DISTINCT username,password "
                                                  "FROM user WHERE user.username = ? "
-                                                 "AND user.password = ?", (Username, Pass))
+                                                 "AND user.password = ?", (player.get_username(), player.get_password()))
                 rows = cursor.fetchall()
                 conn.commit()  # finalize and end transaction with database
                 num_rows = len(rows)
@@ -109,7 +157,7 @@ while True:
                     break
                 elif num_rows == 1:
                     print("[SQLite] Login successful.")  # -> if valid, open games_window
-                    User = values.get("Username")
+                    player.set_login_status("True")
                     successful_info = True
                 elif num_rows > 1:
                     print("[SQLite] Duplicate record(s) found.")
@@ -120,6 +168,7 @@ while True:
                     #break
             except Error as error:
                 print("[SQLite] login query failed to fetch record. Error: ", error)
+                player.set_login_status("False")
                 break
 
     elif signup_window_open:
@@ -134,18 +183,16 @@ while True:
         else:
             event, values = signup_window.read()
             try:
-                User = values.get('Username')
-                Pass = values.get('Password')
-
-                # Attempt to hash password
-                # Pass = hashlib.sha256(Username+Pass)
-
+                username = values.get('Username')
+                password = values.get('Password')
+                player.set_username(values.get('Username'))
+                player.Pass = password
                 sql_check_available = cursor.execute(
                     "SELECT username COLLATE NOCASE FROM user")  # Retrieve username to lowercase
                 rows = cursor.fetchall()
 
                 for element in rows:
-                    if User == element[0]:
+                    if username == element[0]:
                         print("[SQLite] Username found in database. Please try another.")
                         unsuccessful_info = True
                         break
@@ -173,12 +220,12 @@ while True:
             if score is None:
                 print("[SQLite] Flappy Bird Insertion Error...Point value must be > 0.")
                 break
-            elif User is None:
+            elif player.get_username() is None:
                 print("[SQLite] Flappy Bird Insertion Error...Username is null. ")
                 break
             else:
                 sql_flappy_query = cursor.execute("""INSERT INTO flappy(username,score,datetime)
-                                              VALUES (?, ?, ?)""", (User, score, datetime.datetime.now()))
+                                              VALUES (?, ?, ?)""", (player.get_username(), score, datetime.datetime.now()))
                 conn.commit()  # finalize and end transaction with database
                 print("[SQLite] Flappy Bird HS added successfully.")
 
@@ -186,6 +233,17 @@ while True:
             print("[GAME] PLAY PONG")
             #returns score
             pong_score = pygamepong.PongGame()
+
+            if pong_score is None:
+                print("[SQLite] Flappy Bird Insertion Error...Point value must be > 0.")
+                break
+            elif player.get_username() is None:
+                print("[SQLite] Flappy Bird Insertion Error...Username is null. ")
+                break
+            else:
+                sql_pong_query = cursor.execute("""INSERT INTO pong(username,score,datetime) VALUES (?,?,?)""", (player.get_username(), pong_score, datetime.datetime.now()))
+                conn.commit() # finalize transaction with database
+                print("Pong HS added successfully.")
 
         elif event == "Space Invaders":
             print("[GAME] PLAY SPACE INVADERS")
@@ -201,12 +259,12 @@ while True:
         elif event == 'My Stats':
             print("[USER] VIEW STATS")
             # pull from db and print out in pop-up window
-            sql_stats_query = cursor.execute("SELECT * FROM flappy WHERE username = ?", (User,))
+            sql_stats_query = cursor.execute("SELECT * FROM flappy WHERE username = ?", (player.get_username(),))
             output = cursor.fetchall()
             conn.commit()
             flappy_high_score = 0
             for data in output:
-                if data[0] == User:
+                if data[0] == player.get_username():
                     if data[1] >= flappy_high_score:
                         flappy_high_score = data[1]
                         flappy_score_date = data[2]
@@ -214,8 +272,8 @@ while True:
                 flappy_score_date = None
 
             #create a string with all of the player's personal stats for each game
-            example_string = User + "'s High Scores\nFlappy Bird: " + str(flappy_high_score) + "\nSpace Invaders: 3\nPong: 3\nSnake: 17"
-            sg.popup(example_string, title = User + " personal stats", font=14)
+            example_string = player.get_username() + "'s High Scores\nFlappy Bird: " + str(flappy_high_score) + "\nSpace Invaders: 3\nPong: 3\nSnake: 17"
+            sg.popup(example_string, title = player.get_username() + " personal stats", font=14)
             #print out personal high scores, number of times played
 
         elif event == 'High Scores':
@@ -248,6 +306,8 @@ while True:
             # sets login success to false until user signs in again
             unsuccessful_info = False
             successful_info = False
+
+            player.set_login_status("False")
 
     if event == 'Sign In':
 
@@ -308,10 +368,15 @@ while True:
             elif unsuccessful_info:
                 sg.popup_ok('Username already taken. Please enter another.', title = "Invalid Entry", font=14)
             elif successful_info:
+                player.set_username(values.get('Username'))
+                player._Pass = encrypt(values.get('Password'))
+
+                player.set_login_status("True")
                 sql_signup_query = cursor.execute("INSERT OR IGNORE INTO user(username, password) VALUES(?,?);",
-                                                  (User, Pass,))
-                print("[SQLite] Success: Added username: ", User, "\t with password: ", Pass)
+                                                  (player.get_username(), player.get_password(),))
                 conn.commit()  # finalize transaction
+                print("[SQLite] Success: Added username: ", player.get_username(), "\t with password: ", player.get_password())
+
         # CHECK FOR COMPLETE FIELDS FOR SIGN IN
         else:
             # loop to check if info was entered into every field
@@ -326,11 +391,15 @@ while True:
             # pop up if user enters invalid info
             elif unsuccessful_info:
                 sg.popup_ok('Information entered invalid. Please try again.', font=14)
-                
+
+            else:
+                sql_login_query = cursor.execute("SELECT DISTINCT username,password "
+                                                 "FROM user WHERE user.username = ? "
+                                                 "AND user.password = ?", (player.get_username(), player.get_password()))
 
         # if all fields have been filled in -> still have to check if info provided is valid
         # could have another bool that we set to true only when user info has been confirmed
-        if (final_sign_up != True) and (final_sign_in != True) and (successful_info == True):
+        if player.get_login_status():
 
             if signin_window_open:
                 signin_window.close()
@@ -339,7 +408,7 @@ while True:
                 signup_window.close()
                 signup_window_open = False
 
-            games_layout = [[sg.Text("Welcome to Retro Arcade " + User, font=20)],
+            games_layout = [[sg.Text("Welcome to Retro Arcade " + player.get_username(), font=20)],
                             [sg.Button("My Stats", font=16, button_color=('dark grey', 'dark violet')),
                              sg.Button("High Scores", font=16, button_color=('dark grey', 'dark violet')),
                              sg.Button("Sign Out", font=16, button_color=('dark grey', 'dark violet')),
