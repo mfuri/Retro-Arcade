@@ -197,7 +197,6 @@ while True:
             print("[GAME] PLAY SNAKE")
             #returns score!
             snake_score = snake.Snake()
-        
 
         elif event == 'My Stats':
             print("[USER] VIEW STATS")
