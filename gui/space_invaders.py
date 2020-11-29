@@ -29,6 +29,8 @@ from pygame.locals import (
 #game function
 def SI_Game():
     
+    FPS = 60
+    fpsClock = pygame.time.Clock()
     SCREEN_WIDTH = 500
     SCREEN_HEIGHT = 500
 
@@ -282,7 +284,6 @@ def SI_Game():
             #Checks if lost
             #ship.check_alive(aliens)
             if (running == False):
-                print("You Lose on Level: " + str(level+1))
                 if level >= highest_score:
                     highest_score = level
                 lose_screen = True
@@ -318,7 +319,8 @@ def SI_Game():
             if keys[pygame.K_LEFT]:
                 ship.move_left()
             if keys[pygame.K_RIGHT]:
-                ship.move_right()    
+                ship.move_right() 
+            fpsClock.tick(FPS)  
         while lose_screen:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT or (event.type == KEYDOWN and (event.key == K_ESCAPE or event.key == K_q)):
