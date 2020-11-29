@@ -1,9 +1,10 @@
 import base64
 import sqlite3
-from cryptography.fernet import Fernet
 from os import environ
 from os.path import dirname, abspath, join
 from sqlite3 import Error
+
+from cryptography.fernet import Fernet
 
 environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 import PySimpleGUI as sg
@@ -12,8 +13,6 @@ import flappy_bird
 import space_invaders
 import snake
 import datetime as datetime
-import time as time
-
 
 # Encryption
 key = Fernet.generate_key()
@@ -22,7 +21,14 @@ conn = None
 cursor = None
 
 
-
+def encrypt(pwd):
+    print("[Encrypt] Plain Password: ", pwd)
+    pwd_ascii = pwd.encode("ascii")  # set encoding to ascii
+    pwd_bytes = base64.b64encode(pwd_ascii)  # convert password to bytes
+    print("[Encrypt] Password in bytes: ", pwd_bytes)
+    encrypted_password = cipher_suite.encrypt(pwd_bytes)  # Encrypt with AES
+    print("[Encrypt] Encrypted Password: ", encrypted_password)
+    return encrypted_password
 
 
 # Keep libraries in game code (don't need to add it here)
@@ -38,8 +44,6 @@ final_sign_in = False
 final_sign_up = False
 successful_info = False
 unsuccessful_info = False
-
-
 
 event = None  # Event Loop to process "events"
 values = None
@@ -57,7 +61,6 @@ main_layout = [[sg.Button("Sign Up", font=16, button_color=('dark grey', 'dark v
                 sg.Button("Exit", font=16, button_color=('dark grey', 'dark violet'))],
                [sg.Image('1.png')]]
 
-
 print("[System] Please wait: Retro-Arcade is initializing...")
 print("[System] PROJECT ROOT DIR: ", ROOT_DIR)
 
@@ -72,14 +75,28 @@ except Error as error:
 
 
 class Player:
-    _User = "None"
-    _Pass = ""
+    _User = None
+    _Pass = None
     _is_logged_in = False
 
+    def __init__(self):
+        self._is_logged_in = False
+        if not values:
+            print("[Player] Values is None...")
+        else:
+            self._User = values.get('Username')
+            self._Pass = values.get('Password')
+
     def get_username(self):
+        if not self._User:
+            print("Error: Username is None!")
+            _User = values.get('Username')
         return self._User
 
     def get_password(self):
+        if not self._Pass:
+            print("Error: Password is None!")
+            _Pass = "default_because_none_error"
         return self._Pass
 
     def get_login_status(self):
@@ -99,13 +116,60 @@ class Player:
         else:
             self._is_logged_in = False
 
-def encrypt(pwd):
-    print("Plain Password: ", pwd)
-    pwd_ascii = pwd.encode("ascii")  # set encoding to ascii
-    pwd_bytes = base64.b64encode(pwd_ascii)  # convert password to bytes
-    encrypted_password = cipher_suite.encrypt(pwd_bytes)  # Encrypt with AES
-    print("Encrypted Password: ", encrypted_password)
-    return encrypted_password
+    def register(self, uname, pwd):
+        _Username = uname
+        _Pass = pwd
+        cursor.execute("INSERT OR IGNORE INTO user(username, password) VALUES(?,?);",
+                       (_Username, _Pass))
+        conn.commit()  # finalize transaction
+        print("[SQLite] Success: Added username: ", player.get_username(), "\t with password: ", player.get_password())
+
+    def login(self, uname, pwd):
+        self.set_login_status(0)  # make sure class variable '_is_logged_in' is set to False before trying to login
+        try:
+            if not uname or not pwd:
+                sg.popup_ok("Username & Password must be entered...")
+                return False
+  #debug                                                #sql_login_query = cursor.execute("SELECT *  FROM user")
+                                                        #rows = cursor.fetchall()
+                                                        #conn.commit()
+                                                        #for element in rows:
+                                                        #print(element)
+            else:
+                                                        #print("login begin user: ", uname, "password: ", pwd)
+                cursor.execute(
+                    "SELECT DISTINCT username, password FROM user WHERE user.username = ? AND user.password = ?",
+                    (uname, pwd))
+                rows = cursor.fetchall()
+                conn.commit()
+                num_rows = len(rows)
+                                                        #print("\n\nlogin after execute Password: ", pwd)
+
+                # We found one and only one match
+                if num_rows == 1:
+                    print("[SQlite] Login Successful!")
+                    self._is_logged_in = True
+                    self.set_login_status(1)
+                    return True
+
+                # We found no matches
+                elif num_rows <= 0:
+                    sg.popup_ok("Username/Password Combination not found in the database!")
+                    print("[SQLite] No records found...")
+                    self._is_logged_in = False
+
+                # We found duplicates --> this should not be possible.
+                elif num_rows > 1:
+                    sg.popup_ok("Database Error: Duplicate records found.")
+                    print("[SQLite] Duplicate records found... # = ", num_rows)
+
+                else:
+                    print("[SQLite] Unknown failure fetching username & password.")
+        except Error as e:
+            print("[SQLite] login query failed. Error: ", e)
+            return False
+
+
 # Create the Main Window
 main_window = sg.Window('RETRO ARCADE', main_layout, size=(852, 480))
 player = Player()
@@ -139,33 +203,10 @@ while True:
             event, values = signin_window.read()
 
             try:
-                User = values.get('Username')
-                Pass = encrypt(values.get('Password'))
+                player.set_username(values.get('Username'))
+                player.set_password(values.get('Password'))
+                player.login(player.get_username(), player.get_password())
 
-                print(player.get_password())
-
-                sql_login_query = cursor.execute("SELECT DISTINCT username,password "
-                                                 "FROM user WHERE user.username = ? "
-                                                 "AND user.password = ?", (player.get_username(), player.get_password()))
-                rows = cursor.fetchall()
-                conn.commit()  # finalize and end transaction with database
-                num_rows = len(rows)
-
-                if num_rows < 0:
-                    print("[SQLite] Username/Password combination not found in the database.")
-                    events, value = signin_window.read()
-                    break
-                elif num_rows == 1:
-                    print("[SQLite] Login successful.")  # -> if valid, open games_window
-                    player.set_login_status("True")
-                    successful_info = True
-                elif num_rows > 1:
-                    print("[SQLite] Duplicate record(s) found.")
-                    break
-                else:
-                    print("[SQLite] Unknown failure fetching username & password.")
-                    unsuccessful_info = True
-                    #break
             except Error as error:
                 print("[SQLite] login query failed to fetch record. Error: ", error)
                 player.set_login_status("False")
@@ -185,8 +226,8 @@ while True:
             try:
                 username = values.get('Username')
                 password = values.get('Password')
-                player.set_username(values.get('Username'))
-                player.Pass = password
+                player.set_username(username)
+                player.set_password(password)
                 sql_check_available = cursor.execute(
                     "SELECT username COLLATE NOCASE FROM user")  # Retrieve username to lowercase
                 rows = cursor.fetchall()
@@ -200,11 +241,11 @@ while True:
                 if not unsuccessful_info:
                     print("[SQLite] Username is available!")
                     successful_info = True
-                    
+
             except Error as error:
                 print("[SQLite] Signup query failed to fetch record. Error: ", error)
                 break
-               
+
     # NOTE: WHEN EXITING GAME, ENTIRE PROGRAM CLOSES -> FIX THIS
     elif games_window_open:
         event, values = games_window.read()
@@ -225,24 +266,26 @@ while True:
                 break
             else:
                 sql_flappy_query = cursor.execute("""INSERT INTO flappy(username,score,datetime)
-                                              VALUES (?, ?, ?)""", (player.get_username(), score, datetime.datetime.now()))
+                                              VALUES (?, ?, ?)""",
+                                                  (player.get_username(), score, datetime.datetime.now()))
                 conn.commit()  # finalize and end transaction with database
                 print("[SQLite] Flappy Bird HS added successfully.")
 
         elif event == "Pong":
             print("[GAME] PLAY PONG")
-            #returns score
+            # returns score
             pong_score = pygamepong.PongGame()
 
             if pong_score is None:
-                print("[SQLite] Flappy Bird Insertion Error...Point value must be > 0.")
+                print("[SQLite] Pong Insertion Error...Point value must be > 0.")
                 break
             elif player.get_username() is None:
-                print("[SQLite] Flappy Bird Insertion Error...Username is null. ")
+                print("[SQLite] Pong Insertion Error...Username is null. ")
                 break
             else:
-                sql_pong_query = cursor.execute("""INSERT INTO pong(username,score,datetime) VALUES (?,?,?)""", (player.get_username(), pong_score, datetime.datetime.now()))
-                conn.commit() # finalize transaction with database
+                sql_pong_query = cursor.execute("""INSERT INTO pong(username,score,datetime) VALUES (?,?,?)""",
+                                                (player.get_username(), pong_score, datetime.datetime.now()))
+                conn.commit()  # finalize transaction with database
                 print("Pong HS added successfully.")
 
         elif event == "Space Invaders":
@@ -250,11 +293,34 @@ while True:
             # RETURNS SCORE!!!
             score = space_invaders.SI_Game()
             print(score)
+            if score is None:
+                print("[SQLite] Space Invaders Insertion Error...Point value must be > 0.")
+                break
+            elif player.get_username() is None:
+                print("[SQLite] Space Invaders Insertion Error...Username is null. ")
+                break
+            else:
+                sql_space_query = cursor.execute("""INSERT INTO space(username,score,datetime) VALUES (?,?,?)""",
+                                                 (player.get_username(), score, datetime.datetime.now()))
+                conn.commit()  # finalize transaction with database
+                print("Space Invaders HS added successfully.")
 
         elif event == "Snake":
             print("[GAME] PLAY SNAKE")
-            #returns score!
+            # returns score!
             snake_score = snake.Snake()
+
+            if snake_score is None:
+                print("[SQLite] Snake Insertion Error...Point value must be > 0.")
+                break
+            elif player.get_username() is None:
+                print("[SQLite] Snake Insertion Error...Username is null. ")
+                break
+            else:
+                sql_pong_query = cursor.execute("""INSERT INTO snake(username,score,datetime) VALUES (?,?,?)""",
+                                                (player.get_username(), snake_score, datetime.datetime.now()))
+                conn.commit()  # finalize transaction with database
+                print("Snake HS added successfully.")
 
         elif event == 'My Stats':
             print("[USER] VIEW STATS")
@@ -271,27 +337,64 @@ while True:
             if flappy_high_score == 0:
                 flappy_score_date = None
 
-            #create a string with all of the player's personal stats for each game
-            example_string = player.get_username() + "'s High Scores\nFlappy Bird: " + str(flappy_high_score) + "\nSpace Invaders: 3\nPong: 3\nSnake: 17"
-            sg.popup(example_string, title = player.get_username() + " personal stats", font=14)
-            #print out personal high scores, number of times played
+            # create a string with all of the player's personal stats for each game
+            example_string = player.get_username() + "'s High Scores\nFlappy Bird: " + str(
+                flappy_high_score) + "\nSpace Invaders: 3\nPong: 3\nSnake: 17"
+            example_string_sql = cursor.execute(
+                "SELECT * FROM user,flappy,pong,space,snake WHERE user.username = ? LIMIT 10;", (player.get_username(),))
+            rows = cursor.fetchall()
+            conn.commit()
+            sg.popup(example_string, title=player.get_username() + " personal stats", font=14)
+
+            # print out personal high scores, number of times played
+            for element in rows:
+                if player.get_username() == element[0]:
+                    print(element)
 
         elif event == 'High Scores':
-            print("[USER] High scores")
-            sql_stats_query = cursor.execute("SELECT * FROM flappy")
-            output = cursor.fetchall()
+            print("[USER] Overall High scores")
+
+            # FLAPPY BIRD TOP 10
+            sql_flappy_query = cursor.execute("SELECT * FROM flappy LIMIT 10")
+            f_output = cursor.fetchall()
             conn.commit()
-            #iterate through all data, or we could have a high scores
+            for data in f_output:
+                print("Flappy Bird: ", data)
+
+            # PONG TOP 10
+            sql_pong_query = cursor.execute("SELECT * FROM space LIMIT 10")
+            p_output = cursor.fetchall()
+            conn.commit()
+            for data in p_output:
+                print("Pong: ", data)
+
+            # SPACE INVADERS TOP 10
+            sql_space_query = cursor.execute("SELECT * FROM space LIMIT 10")
+            sp_output = cursor.fetchall()
+            conn.commit()
+            for data in sp_output:
+                print("Space Invaders: ", data)
+
+            # SNAKE TOP 10
+            sql_space_query = cursor.execute("SELECT * FROM snake LIMIT 10")
+            sn_output = cursor.fetchall()
+            conn.commit()
+            for data in sn_output:
+                print("Snake: ", data)
+
+            # iterate through all data, or we could have a high scores
             flappy_high_score = 0
-            for data in output:
+            for data in f_output:
                 if data[0] != '':
                     if data[1] >= flappy_high_score:
                         flappy_high_score = data[1]
             if flappy_high_score == 0:
                 flappy_score_date = None
-            example_string = "High Scores\nFlappy Bird: " + str(flappy_high_score) + " (Username: " + data[0] + ")\nSpace Invaders: 3\nPong: 3\nSnake: 17"
+            example_string = "High Scores\nFlappy Bird: " + str(flappy_high_score) + " (Username: " + data[
+                0] + ")\nSpace Invaders: 3\nPong: 3\nSnake: 17"
+
             sg.popup(example_string, title="Retro Arcade High Scores", font=14)
-        
+
             # pull from db and print out in pop-up window
 
         elif event == 'Sign Out':
@@ -364,18 +467,21 @@ while True:
                 if values[value] == '':
                     final_sign_up = True
             if final_sign_up:
-                sg.popup_ok('Please enter information into ALL fields.', title = "Invalid Entry", font=14)
+                sg.popup_ok('Please enter information into ALL fields.', title="Invalid Entry", font=14)
             elif unsuccessful_info:
-                sg.popup_ok('Username already taken. Please enter another.', title = "Invalid Entry", font=14)
+                sg.popup_ok('Username already taken. Please enter another.', title="Invalid Entry", font=14)
             elif successful_info:
-                player.set_username(values.get('Username'))
-                player._Pass = encrypt(values.get('Password'))
+
+                Username = values.get('Username')
+                Password = values.get('Password')
+                player.register(Username, Password)
 
                 player.set_login_status("True")
                 sql_signup_query = cursor.execute("INSERT OR IGNORE INTO user(username, password) VALUES(?,?);",
                                                   (player.get_username(), player.get_password(),))
                 conn.commit()  # finalize transaction
-                print("[SQLite] Success: Added username: ", player.get_username(), "\t with password: ", player.get_password())
+                print("[SQLite] Success: Added username: ", player.get_username(), "\t with password: ",
+                      player.get_password())
 
         # CHECK FOR COMPLETE FIELDS FOR SIGN IN
         else:
@@ -393,9 +499,7 @@ while True:
                 sg.popup_ok('Information entered invalid. Please try again.', font=14)
 
             else:
-                sql_login_query = cursor.execute("SELECT DISTINCT username,password "
-                                                 "FROM user WHERE user.username = ? "
-                                                 "AND user.password = ?", (player.get_username(), player.get_password()))
+                player.login(player.get_username(), player.get_password())
 
         # if all fields have been filled in -> still have to check if info provided is valid
         # could have another bool that we set to true only when user info has been confirmed
@@ -413,7 +517,7 @@ while True:
                              sg.Button("High Scores", font=16, button_color=('dark grey', 'dark violet')),
                              sg.Button("Sign Out", font=16, button_color=('dark grey', 'dark violet')),
                              sg.Cancel("Exit", font=16, button_color=('dark grey', 'dark violet'))],
-                            [sg.Button("Flappy Bird", font=16,button_color=('dark grey', 'dark violet')),
+                            [sg.Button("Flappy Bird", font=16, button_color=('dark grey', 'dark violet')),
                              sg.Button("Pong", font=16, button_color=('dark grey', 'dark violet'))],
                             [sg.Button("Snake", font=16, button_color=('dark grey', 'dark violet')),
                              sg.Button("Space Invaders", font=16, button_color=('dark grey', 'dark violet'))],
