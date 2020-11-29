@@ -128,8 +128,8 @@ class Player:
         self.set_login_status(0)  # make sure class variable '_is_logged_in' is set to False before trying to login
         try:
             if not uname or not pwd:
-                sg.popup_ok("Username & Password must be entered...")
-                return False
+                #sg.popup_ok("Username & Password must be entered...")
+                return 1
   #debug                                                #sql_login_query = cursor.execute("SELECT *  FROM user")
                                                         #rows = cursor.fetchall()
                                                         #conn.commit()
@@ -150,24 +150,26 @@ class Player:
                     print("[SQlite] Login Successful!")
                     self._is_logged_in = True
                     self.set_login_status(1)
-                    return True
+                    return 0
 
                 # We found no matches
                 elif num_rows <= 0:
-                    sg.popup_ok("Username/Password Combination not found in the database!")
+                    #sg.popup_ok("Username/Password Combination not found in the database!")
                     print("[SQLite] No records found...")
                     self._is_logged_in = False
+                    return -1
 
                 # We found duplicates --> this should not be possible.
                 elif num_rows > 1:
-                    sg.popup_ok("Database Error: Duplicate records found.")
+                    #sg.popup_ok("Database Error: Duplicate records found.")
                     print("[SQLite] Duplicate records found... # = ", num_rows)
+                    return 2
 
                 else:
                     print("[SQLite] Unknown failure fetching username & password.")
         except Error as e:
             print("[SQLite] login query failed. Error: ", e)
-            return False
+            return 3
 
 
 # Create the Main Window
@@ -205,7 +207,11 @@ while True:
             try:
                 player.set_username(values.get('Username'))
                 player.set_password(values.get('Password'))
-                player.login(player.get_username(), player.get_password())
+                login_status = player.login(player.get_username(), player.get_password())
+                if login_status == -1:
+                    unsuccessful_info = True
+                elif login_status == 0:
+                    successful_info = True
 
             except Error as error:
                 print("[SQLite] login query failed to fetch record. Error: ", error)
