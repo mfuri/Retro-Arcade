@@ -27,7 +27,8 @@ def Snake():
     GRID_HEIGHT = SCREEN_HEIGHT / GRIDSIZE
     pygame.mixer.music.load("assets/sounds/[ONTIVA.COM] 8-Bit RPG Music - Dance-off _ Original Composition-64k.wav")
     pygame.mixer.music.play(-1)
-    deathSound = pygame.mixer.sound("assets/sounds/deathsound.wav")
+    deathSound = pygame.mixer.Sound("assets/sounds/deathsound.wav")
+    eatSound = pygame.mixer.Sound("assets/sounds/levelup.wav")
     UP = (0, -1)
     DOWN = (0, 1)
     LEFT = (-1, 0)
@@ -63,7 +64,7 @@ def Snake():
             self.direction = random.choice([UP, DOWN, LEFT, RIGHT])
             pygame.mixer.Sound.play(deathSound)
             pygame.mixer.music.stop()
-            print("Death to the snake")
+            print("Death to the snake!")
 
         def point(self, pt):
             if self.length > 1 and (pt[0] * -1, pt[1] * -1) == self.direction:
@@ -104,6 +105,9 @@ def Snake():
         if snake.get_head_position() == apple.position:
             snake.length = snake.length + 1
             apple.randomize()
+            pygame.mixer.Sound.play(eatSound)
+            pygame.mixer.music.stop()
+            print("Snake has eaten an apple!")
 
 
     player = Snake()
