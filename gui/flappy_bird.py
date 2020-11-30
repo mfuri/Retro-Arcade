@@ -64,7 +64,7 @@ def Flappy_Game():
     class Background(pygame.sprite.Sprite):
         def __init__(self):
             pygame.sprite.Sprite.__init__(self)  #call Sprite initializer
-            self.image = pygame.image.load('assets/sprites/background2.png')
+            self.image = pygame.image.load('assets/sprites/background2.png').convert_alpha()
             self.rect = self.image.get_rect()
             self.rect.center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
 
@@ -79,7 +79,7 @@ def Flappy_Game():
     class Pipe(pygame.sprite.Sprite):
         def __init__(self):
             #create pipe
-            self.pipe_image = pygame.image.load('assets/sprites/spear.png')
+            self.pipe_image = pygame.image.load('assets/sprites/spear.png').convert_alpha()
 
         def create_new_pipe(self):
             pipe_heights = [350, 300, 250, 200, 180]
@@ -198,9 +198,9 @@ def Flappy_Game():
     flappy = True
     points = 0
     highest_score = 0
+    all_sprites = pygame.sprite.Group()
     while True:
         player = Player()
-        all_sprites = pygame.sprite.Group()
         all_sprites.add(player)
 
         while start_screen:
