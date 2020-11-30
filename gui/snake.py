@@ -7,7 +7,7 @@ from pygame.locals import *
 #environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 
 def Snake():
-    FPS = 10
+    FPS = 15
     pygame.init()
     fpsClock = pygame.time.Clock()
     red = (255, 0, 0)
@@ -47,6 +47,15 @@ def Snake():
         screen.blit(window, oect)
         screen.blit(text, oect)
 
+    def loseScreen():
+        font = pygame.font.Font(None, 36)
+        text = font.render("Press Space to Continue", True, (255,255,255))
+        window = font.render("Press Space to Continue (Q or ESC to Quit)", True, (0, 0, 0))
+        tRect = text.get_rect(center=((SCREEN_WIDTH / 2), (SCREEN_HEIGHT / 2) - 110))
+        oect = window.get_rect(center=((SCREEN_WIDTH / 2) + 2, (SCREEN_HEIGHT / 2) - 108))
+        screen.blit(window, oect)
+        screen.blit(text, oect)
+
     class Snake(object):
         def __init__(self):
             self.lose()
@@ -60,11 +69,15 @@ def Snake():
             self.positions = [((SCREEN_WIDTH / 2), (SCREEN_HEIGHT / 2))]
             self.direction = random.choice([UP, DOWN, LEFT, RIGHT])
 
+
         def point(self, pt):
-            if self.length > 1 and (pt[0] * -1, pt[1] * -1) == self.direction:
-                return
+            if self.length > 2 and (pt[0] * -1, pt[1] * -1) == self.direction:
+                print(pt[0] * -1, pt[1] * -1)
+                self.lose()
+                return False
             else:
                 self.direction = pt
+                return True
 
         def move(self):
             cur = self.positions[0]
@@ -102,27 +115,68 @@ def Snake():
 
     player = Snake()
     goal = Apple()
+    start = True
+    lost = False
     while True:
-        for event in pygame.event.get():
-            if event.type == KEYDOWN:
-                if event.key == K_UP:
-                    player.point(UP)
-                elif event.key == K_DOWN:
-                    player.point(DOWN)
-                elif event.key == K_LEFT:
-                    player.point(LEFT)
-                elif event.key == K_RIGHT:
-                    player.point(RIGHT)
-                if event.type == QUIT or (event.type == KEYDOWN and (event.key == K_ESCAPE or event.key == K_q)):
-                    pygame.quit()
-                    print(player.length)
-                    return player.length
+        player = Snake()
+        goal = Apple()
+        while start:
+            surface.fill(black)
+            for event in pygame.event.get():
+                if event.type == KEYDOWN:
+                    if event.key == K_SPACE:
+                        start = False
+                        running = True
+                    elif event.type == QUIT or (event.type == KEYDOWN and (event.key == K_ESCAPE or event.key == K_q)):
+                        pygame.display.quit()
+                        return player.length
+                pygame.display.update()
+            
+            font = pygame.font.Font(None, 30)
+            text = font.render("Press Space to Start", True, white, black)
+            tRect = text.get_rect(center=((SCREEN_WIDTH / 2), (SCREEN_HEIGHT / 2) - 110))
+            screen.blit(text, tRect)
+            pygame.display.flip()
+
+        while running:
+            for event in pygame.event.get():
+                if event.type == KEYDOWN:
+                    if event.key == K_UP:
+                        if not player.point(UP):
+                            running = False
+                            lost = True
+                            break
+                    elif event.key == K_DOWN:
+                        if not player.point(DOWN):
+                            running = False
+                            lost = True
+                            break
+                    elif event.key == K_LEFT:
+                        if not player.point(LEFT):
+                            running = False
+                            lost = True
+                            break
+                    elif event.key == K_RIGHT:
+                        if not player.point(RIGHT):
+                            running = False
+                            lost = True
+                            break
+                    if event.type == QUIT or (event.type == KEYDOWN and (event.key == K_ESCAPE or event.key == K_q)):
+                        pygame.quit()
+                        return player.length
+
+            if lost:
+                player = Snake()
+                goal = Apple()
+                break
 
             surface.fill(black)
-            player.move()
+
             check_eat(player, goal)
             player.draw(surface)
             goal.draw(surface)
+            player.move()
+    
             font = pygame.font.Font(None, 36)
             text = font.render(str(player.length), 1, (white))
             textpos = text.get_rect()
@@ -132,3 +186,22 @@ def Snake():
             pygame.display.flip()
             pygame.display.update()
             fpsClock.tick(FPS)
+        
+        while lost:
+            surface.fill(black)
+            pygame.display.update()
+            for event in pygame.event.get():
+                if event.type == KEYDOWN:
+                    if event.key == K_SPACE:
+                        start = True
+                        lost = False
+                    if event.type == QUIT or (event.type == KEYDOWN and (event.key == K_ESCAPE or event.key == K_q)):
+                        pygame.quit()
+                        return player.length
+                
+            font = pygame.font.Font(None, 30)
+            text = font.render("You lose. Press Space to Continue", 1, white, black)
+            tRect = text.get_rect(center=((SCREEN_WIDTH / 2), (SCREEN_HEIGHT / 2) - 110))
+            screen.blit(text, tRect)
+            pygame.display.flip()
+    pygame.display.quit()
