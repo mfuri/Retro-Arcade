@@ -1,10 +1,11 @@
 import pygame
 import sys
 import time
+import os
 import random
-import pygame.locals
+from os import environ
 from pygame.locals import *
-#environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
+environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 
 def Snake():
     FPS = 10
@@ -24,8 +25,9 @@ def Snake():
     GRIDSIZE = 10
     GRID_WIDTH = SCREEN_WIDTH / GRIDSIZE
     GRID_HEIGHT = SCREEN_HEIGHT / GRIDSIZE
-    #runningSound = pygame.mixer.sound("assets/sounds/sample.wav")
-    #deathSound = pygame.mixer.sound("assets/sounds/sample2.wav")
+    pygame.mixer.music.load("assets/sounds/[ONTIVA.COM] 8-Bit RPG Music - Dance-off _ Original Composition-64k.wav")
+    pygame.mixer.music.play(-1)
+    deathSound = pygame.mixer.sound("assets/sounds/deathsound.wav")
     UP = (0, -1)
     DOWN = (0, 1)
     LEFT = (-1, 0)
@@ -59,6 +61,9 @@ def Snake():
             self.length = 1
             self.positions = [((SCREEN_WIDTH / 2), (SCREEN_HEIGHT / 2))]
             self.direction = random.choice([UP, DOWN, LEFT, RIGHT])
+            pygame.mixer.Sound.play(deathSound)
+            pygame.mixer.music.stop()
+            print("Death to the snake")
 
         def point(self, pt):
             if self.length > 1 and (pt[0] * -1, pt[1] * -1) == self.direction:
@@ -78,8 +83,8 @@ def Snake():
                     self.positions.pop()
 
         def draw(self, surf):
-            for p in self.positions:
-                draw_box(surf, self.color, p)
+            for pos in self.positions:
+                draw_box(surf, self.color, pos)
 
 
     class Apple(object):
@@ -100,6 +105,7 @@ def Snake():
             snake.length = snake.length + 1
             apple.randomize()
 
+
     player = Snake()
     goal = Apple()
     while True:
@@ -113,10 +119,9 @@ def Snake():
                     player.point(LEFT)
                 elif event.key == K_RIGHT:
                     player.point(RIGHT)
-                if event.type == QUIT or (event.type == KEYDOWN and (event.key == K_ESCAPE or event.key == K_q)):
+                if event.type == QUIT:
                     pygame.quit()
-                    print(player.length)
-                    return player.length
+                    sys.exit()
 
             surface.fill(black)
             player.move()
