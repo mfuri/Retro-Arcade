@@ -175,22 +175,14 @@ class Player:
         self.set_login_status(0)  # make sure class variable '_is_logged_in' is set to False before trying to login
         try:
             if not uname or not pwd:
-                #sg.popup_ok("Username & Password must be entered...")
-                return 1
-  #debug                                                #sql_login_query = cursor.execute("SELECT *  FROM user")
-                                                        #rows = cursor.fetchall()
-                                                        #conn.commit()
-                                                        #for element in rows:
-                                                        #print(element)
+                return 1                                             
             else:
-                                                        #print("login begin user: ", uname, "password: ", pwd)
                 cursor.execute(
                     "SELECT DISTINCT username, password FROM user WHERE user.username = ? AND user.password = ?",
                     (uname, pwd))
                 rows = cursor.fetchall()
                 conn.commit()
                 num_rows = len(rows)
-                                                        #print("\n\nlogin after execute Password: ", pwd)
 
                 # We found one and only one match
                 if num_rows == 1:
@@ -201,14 +193,12 @@ class Player:
 
                 # We found no matches
                 elif num_rows <= 0:
-                    #sg.popup_ok("Username/Password Combination not found in the database!")
                     print("[SQLite] No records found...")
                     self._is_logged_in = False
                     return -1
 
                 # We found duplicates --> this should not be possible.
                 elif num_rows > 1:
-                    #sg.popup_ok("Database Error: Duplicate records found.")
                     print("[SQLite] Duplicate records found... # = ", num_rows)
                     return 2
 
@@ -396,34 +386,38 @@ while True:
                 flappy_score) + "\nSpace Invaders: " + str(si_score) + "\nPong: " + str(pong_score
                 )  + "\nSnake: " + str(snake_score)
 
-            # example_string_sql = cursor.execute(
-            #     "SELECT * FROM user,flappy,pong,space,snake WHERE user.username = ? LIMIT 10;", (player.get_username(),))
-            # rows = cursor.fetchall()
-            # conn.commit()
-
             sg.popup(stats_string, title=player.get_username(), font=16)
 
         elif event == 'High Scores':
             print("[USER] Overall High scores")
 
             # iterate through all data, or we could have a high scores
+            #FLAPPY BIRD OVERALL HIGH SCORE
             flappy_score, flappy_player = get_high_scores("flappy")
+
+            #SPACE INVADERS OVERALL HIGH SCORE
             si_score, si_player = get_high_scores("space")
+
+            #PONG OVERALL HIGH SCORE - NOT WORKING!!!
             #pong_score, pong_player = get_high_scores("pong")
             pong_score = 0
             pong_player = "NOT WORKING PROPERLY"
+
+            #SNAKE OVERALL HIGH SCORE
             snake_score, snake_player = get_high_scores("snake")
 
+            #high score string that appears in popup
             high_score_string = "High Scores\nFlappy Bird: " + str(flappy_score
             ) + " (Username: " + flappy_player + ")\nSpace Invaders: " + str(si_score
             ) + " (Username: " + si_player + ")\nPong: "+ str(pong_score
             ) + " (Username: " + pong_player +"\nSnake: " + str(snake_score
             ) + " (Username: " + snake_player + ")\n"
 
+            #high score popup
             sg.popup(high_score_string, title="Retro Arcade High Scores", font=16)
 
-            # pull from db and print out in pop-up window
         elif event == 'Top Players':
+            #top player string that will be printed out in popup
             top_string = "Top 5 Players\n\nFlappy Bird\n"
 
             # FLAPPY BIRD TOP 5
@@ -437,7 +431,7 @@ while True:
             for player_ in si_list:
                 top_string += "\t" + player_ + "\n"
             
-            #PONG TOP 5
+            #PONG TOP 5 - NOT WORKING -DB COLUMNS DO NOT MATCH OTHER TABLES
             # top_string += "Pong\n"
             # pong_list = get_top_player("pong")
             # for player in pong_list:
@@ -449,8 +443,8 @@ while True:
             for player_ in snake_list:
                 top_string += "\t" + player_ + "\n"
             
-            #want to create string with top five players for printout
             
+            #prints out top players for all of the games
             sg.popup(top_string, title="Top Players", font=16)
 
         elif event == 'Sign Out':
