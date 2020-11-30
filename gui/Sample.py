@@ -20,6 +20,53 @@ cipher_suite = Fernet(key)
 conn = None
 cursor = None
 
+#returns players stats and corresponding date of game played
+def get_stats(table, username):
+    sql_stats_query = cursor.execute("SELECT * FROM " + table + " WHERE username = ?", (username,))
+    output = cursor.fetchall()
+    conn.commit()
+    high_score = 0
+    for data in output:
+        if data[0] == player.get_username():
+            if data[1] >= high_score:
+                high_score = data[1]
+                score_date = data[2]
+    if high_score == 0:
+        score_date = None
+
+    return high_score, score_date
+
+def get_high_scores(table):
+    query = cursor.execute("SELECT * FROM "+ table)
+    output = cursor.fetchall()
+    conn.commit()
+
+    high_score = 0
+    player_name = ""
+   
+    for data in output:
+        if data[0] != '':
+            if data[1] >= high_score:
+                high_score = data[1]
+                player_name = data[0]
+
+    if high_score == 0:
+        score_date = None
+
+    return high_score, player_name
+
+def get_top_player(table):
+    #return sorted list of top players for specific game
+    query = cursor.execute("SELECT DISTINCT username, score FROM " + table + " ORDER BY score DESC LIMIT 10")
+    output = cursor.fetchall()
+    conn.commit()
+
+    player_list = []
+    for data in output:
+        if data[0] not in player_list:
+            player_list.append(data[0])
+    
+    return player_list
 
 def encrypt(pwd):
     print("[Encrypt] Plain Password: ", pwd)
@@ -331,77 +378,80 @@ while True:
         elif event == 'My Stats':
             print("[USER] VIEW STATS")
             # pull from db and print out in pop-up window
-            sql_stats_query = cursor.execute("SELECT * FROM flappy WHERE username = ?", (player.get_username(),))
-            output = cursor.fetchall()
-            conn.commit()
-            flappy_high_score = 0
-            for data in output:
-                if data[0] == player.get_username():
-                    if data[1] >= flappy_high_score:
-                        flappy_high_score = data[1]
-                        flappy_score_date = data[2]
-            if flappy_high_score == 0:
-                flappy_score_date = None
+
+            #pull flappy bird data
+            flappy_score, flappy_date = get_stats("flappy", player.get_username())
+
+            #pull space invaders data
+            si_score, si_date = get_stats("space", player.get_username())
+
+            #pull pong data
+            pong_score, pong_date = get_stats("pong", player.get_username())
+
+            #pull snake data
+            snake_score, snake_date = get_stats("snake", player.get_username())
 
             # create a string with all of the player's personal stats for each game
-            example_string = player.get_username() + "'s High Scores\nFlappy Bird: " + str(
-                flappy_high_score) + "\nSpace Invaders: 3\nPong: 3\nSnake: 17"
-            example_string_sql = cursor.execute(
-                "SELECT * FROM user,flappy,pong,space,snake WHERE user.username = ? LIMIT 10;", (player.get_username(),))
-            rows = cursor.fetchall()
-            conn.commit()
-            sg.popup(example_string, title=player.get_username() + " personal stats", font=14)
+            stats_string = player.get_username() + "'s High Scores\nFlappy Bird: " + str(
+                flappy_score) + "\nSpace Invaders: " + str(si_score) + "\nPong: " + str(pong_score
+                )  + "\nSnake: " + str(snake_score)
 
-            # print out personal high scores, number of times played
-            for element in rows:
-                if player.get_username() == element[0]:
-                    print(element)
+            # example_string_sql = cursor.execute(
+            #     "SELECT * FROM user,flappy,pong,space,snake WHERE user.username = ? LIMIT 10;", (player.get_username(),))
+            # rows = cursor.fetchall()
+            # conn.commit()
+
+            sg.popup(stats_string, title=player.get_username(), font=16)
 
         elif event == 'High Scores':
             print("[USER] Overall High scores")
 
-            # FLAPPY BIRD TOP 10
-            sql_flappy_query = cursor.execute("SELECT * FROM flappy LIMIT 10")
-            f_output = cursor.fetchall()
-            conn.commit()
-            for data in f_output:
-                print("Flappy Bird: ", data)
-
-            # PONG TOP 10
-            sql_pong_query = cursor.execute("SELECT * FROM space LIMIT 10")
-            p_output = cursor.fetchall()
-            conn.commit()
-            for data in p_output:
-                print("Pong: ", data)
-
-            # SPACE INVADERS TOP 10
-            sql_space_query = cursor.execute("SELECT * FROM space LIMIT 10")
-            sp_output = cursor.fetchall()
-            conn.commit()
-            for data in sp_output:
-                print("Space Invaders: ", data)
-
-            # SNAKE TOP 10
-            sql_space_query = cursor.execute("SELECT * FROM snake LIMIT 10")
-            sn_output = cursor.fetchall()
-            conn.commit()
-            for data in sn_output:
-                print("Snake: ", data)
-
             # iterate through all data, or we could have a high scores
-            flappy_high_score = 0
-            for data in f_output:
-                if data[0] != '':
-                    if data[1] >= flappy_high_score:
-                        flappy_high_score = data[1]
-            if flappy_high_score == 0:
-                flappy_score_date = None
-            example_string = "High Scores\nFlappy Bird: " + str(flappy_high_score) + " (Username: " + data[
-                0] + ")\nSpace Invaders: 3\nPong: 3\nSnake: 17"
+            flappy_score, flappy_player = get_high_scores("flappy")
+            si_score, si_player = get_high_scores("space")
+            #pong_score, pong_player = get_high_scores("pong")
+            pong_score = 0
+            pong_player = "NOT WORKING PROPERLY"
+            snake_score, snake_player = get_high_scores("snake")
 
-            sg.popup(example_string, title="Retro Arcade High Scores", font=14)
+            high_score_string = "High Scores\nFlappy Bird: " + str(flappy_score
+            ) + " (Username: " + flappy_player + ")\nSpace Invaders: " + str(si_score
+            ) + " (Username: " + si_player + ")\nPong: "+ str(pong_score
+            ) + " (Username: " + pong_player +"\nSnake: " + str(snake_score
+            ) + " (Username: " + snake_player + ")\n"
+
+            sg.popup(high_score_string, title="Retro Arcade High Scores", font=16)
 
             # pull from db and print out in pop-up window
+        elif event == 'Top Players':
+            top_string = "Top 5 Players\n\nFlappy Bird\n"
+
+            # FLAPPY BIRD TOP 5
+            flappy_list = get_top_player("flappy")
+            for player_ in flappy_list:
+                top_string += "\t" + player_ + "\n"
+            
+            #SPACE INVADER TOP 5
+            top_string += "Space Invaders\n"
+            si_list = get_top_player("space")
+            for player_ in si_list:
+                top_string += "\t" + player_ + "\n"
+            
+            #PONG TOP 5
+            # top_string += "Pong\n"
+            # pong_list = get_top_player("pong")
+            # for player in pong_list:
+            #     top_string += "\t" + player + "\n"
+
+            #SNAKE TOP 5
+            top_string += "Snake\n"
+            snake_list = get_top_player("snake")
+            for player_ in snake_list:
+                top_string += "\t" + player_ + "\n"
+            
+            #want to create string with top five players for printout
+            
+            sg.popup(top_string, title="Top Players", font=16)
 
         elif event == 'Sign Out':
             # returns to main window
@@ -521,6 +571,7 @@ while True:
             games_layout = [[sg.Text("Welcome to Retro Arcade " + player.get_username(), font=20)],
                             [sg.Button("My Stats", font=16, button_color=('dark grey', 'dark violet')),
                              sg.Button("High Scores", font=16, button_color=('dark grey', 'dark violet')),
+                             sg.Button("Top Players", font=16, button_color=('dark grey', 'dark violet')),
                              sg.Button("Sign Out", font=16, button_color=('dark grey', 'dark violet')),
                              sg.Cancel("Exit", font=16, button_color=('dark grey', 'dark violet'))],
                             [sg.Button("Flappy Bird", font=16, button_color=('dark grey', 'dark violet')),
