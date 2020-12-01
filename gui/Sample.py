@@ -236,48 +236,57 @@ class Player:
 
     def view_stats(self):
         # pull from db and print out in pop-up window
+        return_list = []
 
         # pull flappy bird data
         cursor.execute("SELECT username, score AS f_score, STRFTIME('%d/%m/%Y', datetime) AS f_date FROM flappy WHERE username=? ORDER BY score LIMIT 50 OFFSET 1", (self.get_username(),))
+        cursor.execute("SELECT MAX(score) FROM flappy WHERE username = ?", (self.get_username(),))
         f_rows = cursor.fetchall()
         conn.commit()
 
-        print("FLAPPY BIRD USER VIEW STATS: \n")
-        for element1 in f_rows:
-            print(element1)
-
-
+        #print("FLAPPY BIRD USER VIEW STATS: \n")
+        if f_rows != []:
+            for element in f_rows:
+                return_list.append(element[0])
+        else:
+            return_list.append(0)
         # pull space invaders data
         cursor.execute("SELECT username, score AS sp_score, STRFTIME('%d/%m/%Y', datetime) AS sp_date FROM space WHERE username=? ORDER BY score LIMIT 50 OFFSET 1", (self.get_username(),))
         sp_rows = cursor.fetchall()
         conn.commit()
 
-        print("SPACE INVADERS USER VIEW STATS: \n")
-        for element2 in sp_rows:
-            print(element2)
+        if sp_rows != []:
+            for element in sp_rows:
+                return_list.append(element[0])
+        else:
+            return_list.append(0)
 
         # pull pong data
         cursor.execute("SELECT username, score AS p_score, STRFTIME('%d/%m/%Y', date) AS p_date FROM pong WHERE username=? ORDER BY score LIMIT 50 OFFSET 1", (self.get_username(),))
         p_rows = cursor.fetchall()
         conn.commit()
-
-        print("PONG USER VIEW STATS: \n")
-        for element3 in p_rows:
-            print(element3)
+        
+        if p_rows != []:
+            for element in p_rows:
+                return_list.append(element[0])
+        else:
+            return_list.append(0)
 
         # pull snake data
         cursor.execute("SELECT username, score AS sn_score, STRFTIME('%d/%m/%Y', date) AS sn_date FROM pong WHERE username=? ORDER BY score LIMIT 50 OFFSET 1", (self.get_username(),))
         sn_rows = cursor.fetchall()
         conn.commit()
 
-        print("SNAKE USER VIEW STATS: \n")
-        for element4 in sn_rows:
-            print(element4)
-        # create a string with all of the player's personal stats for each game
-      #  stats_string = self.get_username() + "'s High Scores\nFlappy Bird: " + str(
-       #     f_score) + '\t' + f_date + "\nSpace Invaders: " + str(sp_score) + '\t' + sp_date +"\nPong: " + str(p_score)  + '\t' + p_date + "\nSnake: " + str(sn_score) + '\t' + str(sn_date)
+        if sn_rows != []:
+            for element in sn_rows:
+                return_list.append(element[0])
+        else:
+            return_list.append(0)
 
-#        sg.popup_scrolled(stats_string, title=self.get_username(), font=16)
+        #returns list with scores ordered: flappy bird, space invaders, pong, snake
+        return return_list
+
+
 
 
 # Create the Main Window
@@ -440,8 +449,15 @@ while True:
         elif event == 'My Stats':
             if DEBUG:
                 print("[USER] VIEW STATS")
-            player.view_stats()
+            stats_list = player.view_stats()
+            stats_string = player.get_username() + "'s High Scores\n*******************\nFlappy Bird:\t" + str(stats_list[0]
+                    ) + "\nSpace Invaders:\t" + str(stats_list[1]
+                    ) + "\nPong:\t" + str(stats_list[2]
+                    )  + "\nSnake:\t" + str(stats_list[3])
 
+            sg.popup_scrolled(stats_string, title = player.get_username(), font = 16)
+            
+            #sg.popup_scrolled(stats_string, title=self.get_username(), font=16)
         elif event == 'High Scores':
             print("[USER] Overall High scores")
 
