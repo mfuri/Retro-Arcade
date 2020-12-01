@@ -141,6 +141,8 @@ def Snake():
                         if player.length > highest_score:
                             highest_score = player.length
                         return highest_score
+                if event.type == QUIT:
+                    pygame.quit()
                 pygame.display.update()
 
             font = pygame.font.Font(None, 30)
@@ -172,11 +174,14 @@ def Snake():
                             running = False
                             lost = True
                             break
+                if event.type == QUIT:
+                    pygame.quit()
                     if event.type == QUIT or (event.type == KEYDOWN and (event.key == K_ESCAPE or event.key == K_q)):
                         pygame.mixer.Sound.play(deathSound)
                         pygame.mixer.music.stop()
                         print("User has quit :(")
                         pygame.quit()
+                        sys.exit()
                         if player.length > highest_score:
                             highest_score = player.length
                         return highest_score
