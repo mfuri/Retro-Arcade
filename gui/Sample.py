@@ -43,7 +43,7 @@ def get_high_scores(table):
 
     high_score = 0
     player_name = ""
-   
+
     for data in output:
         if data[0] != '':
             if data[1] >= high_score:
@@ -414,17 +414,37 @@ while True:
             ) + " (Username: " + snake_player + ")\n"
 
             #high score popup
-            sg.popup(high_score_string, title="Retro Arcade High Scores", font=16)
+            sg.popup_scrolled(high_score_string, title="Retro Arcade High Scores", font=16)
 
         elif event == 'Top Players':
             #top player string that will be printed out in popup
             top_string = "Top 5 Players\n\nFlappy Bird\n"
 
             # FLAPPY BIRD TOP 5
-            flappy_list = get_top_player("flappy")
-            for player_ in flappy_list:
-                top_string += "\t" + player_ + "\n"
-            
+
+            cursor.execute("""SELECT username, score
+                                           FROM pong
+                                           GROUP BY username, score
+                                           ORDER BY score DESC
+                                           LIMIT 5 OFFSET 1""")
+            rows = cursor.fetchall()
+            conn.commit()
+            top_string += "\n\tUsername\t\tScore\n\t--------------------------------------------\n"
+            num = 1
+            for element in rows:
+                toString = str(element)
+                uname, points = toString.split(',')
+                top_string += "\t" + str(num) + ".\t" + uname + '\t\t' + points + '\n'
+                num += 1
+            num = 0
+            top_string += "\n"
+            #flappy_list = get_top_player("flappy")
+            #for player_ in flappy_list:
+            #    top_string += "\t" + player_ + "\n"
+
+
+
+
             #SPACE INVADER TOP 5
             top_string += "Space Invaders\n"
             si_list = get_top_player("space")
