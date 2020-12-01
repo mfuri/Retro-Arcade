@@ -5,8 +5,6 @@ import random
 import pygame.locals
 from os import environ
 from pygame.locals import *
-
-
 environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 
 def Snake():
@@ -31,7 +29,7 @@ def Snake():
     pygame.mixer.music.load("assets/sounds/[ONTIVA.COM] 8-Bit RPG Music - Dance-off _ Original Composition-64k.wav")
     pygame.mixer.music.play(-1)
     deathSound = pygame.mixer.Sound("assets/sounds/deathsound.wav")
-    eatSound = pygame.mixer.Sound("assets/sound/levelup.wav")
+    eatSound = pygame.mixer.Sound("assets/sounds/levelup.wav")
     UP = (0, -1)
     DOWN = (0, 1)
     LEFT = (-1, 0)
