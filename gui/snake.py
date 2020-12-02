@@ -177,13 +177,11 @@ def Snake():
                 if event.type == QUIT or (event.type == KEYDOWN and (event.key == K_ESCAPE or event.key == K_q)):
                     pygame.mixer.Sound.play(deathSound)
                     pygame.mixer.music.stop()
-                    print("User has quit :(")
                     pygame.quit()
-                    sys.exit()
                     if player.length > highest_score:
                         highest_score = player.length
-                        return highest_score
-
+                    return highest_score
+                    
             if lost:
                 player = Snake()
                 goal = Apple()
