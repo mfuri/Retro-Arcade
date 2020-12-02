@@ -21,8 +21,8 @@ from os import environ
 from os.path import dirname, abspath, join
 from sqlite3 import Error
 from cryptography.fernet import Fernet
-
 environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
+
 # Encryption
 key = Fernet.generate_key()
 cipher_suite = Fernet(key)
