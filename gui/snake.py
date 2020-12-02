@@ -143,6 +143,9 @@ def Snake():
                         return highest_score
                 if event.type == QUIT:
                     pygame.quit()
+                    if player.length > highest_score:
+                        highest_score = player.length
+                    return highest_score
                 pygame.display.update()
 
             font = pygame.font.Font(None, 30)
@@ -213,11 +216,11 @@ def Snake():
                     if event.key == K_SPACE:
                         start = True
                         lost = False
-                    if event.type == QUIT or (event.type == KEYDOWN and (event.key == K_ESCAPE or event.key == K_q)):
-                        pygame.quit()
-                        if player.length > highest_score:
-                            highest_score = player.length
-                        return highest_score
+                if event.type == QUIT or (event.type == KEYDOWN and (event.key == K_ESCAPE or event.key == K_q)):
+                    pygame.quit()
+                    if player.length > highest_score:
+                        highest_score = player.length
+                    return highest_score
 
             font = pygame.font.Font(None, 30)
             text = font.render("You lose. Press Space to Continue", 1, white, black)
