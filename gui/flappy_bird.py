@@ -17,6 +17,8 @@ import pygame.freetype
 
 def Flappy_Game():
     #Imports keyboard controls for Pygame
+    FPS = 60
+    fpsClock = pygame.time.Clock()
     from pygame.locals import (
         K_SPACE,
         K_q,
@@ -62,7 +64,7 @@ def Flappy_Game():
     class Background(pygame.sprite.Sprite):
         def __init__(self):
             pygame.sprite.Sprite.__init__(self)  #call Sprite initializer
-            self.image = pygame.image.load('assets/sprites/background2.png')
+            self.image = pygame.image.load('assets/sprites/background2.png').convert_alpha()
             self.rect = self.image.get_rect()
             self.rect.center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
 
@@ -77,7 +79,7 @@ def Flappy_Game():
     class Pipe(pygame.sprite.Sprite):
         def __init__(self):
             #create pipe
-            self.pipe_image = pygame.image.load('assets/sprites/spear.png')
+            self.pipe_image = pygame.image.load('assets/sprites/spear.png').convert_alpha()
 
         def create_new_pipe(self):
             pipe_heights = [350, 300, 250, 200, 180]
@@ -190,64 +192,57 @@ def Flappy_Game():
     pygame.display.flip()
     pressed_keys = pygame.key.get_pressed()
 
+    running = True
+    start_screen = True 
+    highest_score = 0
     flappy = True
     points = 0
     highest_score = 0
-    while flappy:
+    all_sprites = pygame.sprite.Group()
+    while True:
         player = Player()
-        all_sprites = pygame.sprite.Group()
         all_sprites.add(player)
-        points = 0
 
-        running = True
-        #Press Space to Start Loop
-        while running:
+        while start_screen:
             for event in pygame.event.get():
-                    if event.type == pygame.QUIT or (event.type == KEYDOWN and (event.key == K_ESCAPE or event.key == K_q)):
-                        pygame.quit()
-                        return points
-                        #sys.exit()
-                    elif event.type == KEYDOWN and event.key == K_SPACE:
-                        player.jump()
-                        pygame.mixer.Sound.play(flap_sound)
-                        running = False
-                    elif event.type == KEYDOWN and event.key != K_SPACE:
-                        pygame.mixer.Sound.play(error_sound)
-
-            #loads background image into game
+                if event.type == pygame.QUIT or (event.type == KEYDOWN and (event.key == K_ESCAPE or event.key == K_q)):
+                    pygame.quit()
+                    return points
+                    #sys.exit()
+                elif event.type == KEYDOWN and event.key == K_SPACE:
+                    player.jump()
+                    points = 0
+                    pygame.mixer.Sound.play(flap_sound)
+                    start_screen = False
+                elif event.type == KEYDOWN and event.key != K_SPACE:
+                    pygame.mixer.Sound.play(error_sound)
+                    #Will play error sound when invaid key is pressed
+             #loads background image into game
             screen.fill([255, 255, 255])
             screen.blit(bg.image, bg.rect)
             screen.blit(player.surf, ((SCREEN_WIDTH / 2)-17, player.rect.y))
             screen.blit(base.image, base.rect)
-            #pipe.draw(screen)
             #Welcome image
             welcome_message()
-            #screen.blit(welcome.image,welcome.rect)
             pygame.display.flip()
-
-        running = True
-        #main game loop
-        #game loop
         
         while running:
             #turn false when user hits pipe or the ground or the top of the screen
             for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False
+                if event.type == pygame.QUIT or (event.type == KEYDOWN and (event.key == K_ESCAPE or event.key == K_q)):
+                    pygame.quit()
+                    return points
             # Controls -- Space = jump; q, escape = quit
-                if event.type == KEYDOWN and event.key == K_SPACE:
+                elif event.type == KEYDOWN and event.key == K_SPACE:
                     player.jump()
                     points += 1
                     pygame.mixer.Sound.play(flap_sound)
-                elif event.type == KEYDOWN and (event.key == K_q or K_ESCAPE):
-                    pygame.quit()
-                    return points
-                    #sys.exit()
-                if event.type == SPAWNPIPE:
+                elif event.type == SPAWNPIPE:
                     pipes.extend(pipe.create_new_pipe())
                     
 
             player.update()
+
             #pipe.check_collision(pipes, player)
             if pipe.check_collision(pipes, player):
                 pygame.mixer.Sound.play(death_sound)
@@ -258,6 +253,7 @@ def Flappy_Game():
                 pygame.mixer.Sound.play(death_sound)
                 lose(str(points))
                 running = False
+
             #loads background image into game
             screen.fill([255, 255, 255])
             screen.blit(bg.image, bg.rect)
@@ -268,28 +264,29 @@ def Flappy_Game():
             #draw pipes
             pipe.draw_pipes(pipes)
             pipe.move_pipes(pipes)
+
+            #draws stats on screen
             stats(str(points))
             pygame.display.flip()
+            fpsClock.tick(FPS)
             
-        running = True
-        while running:
-            #turn false when user hits green pipe or the ground or the top of the screen
+        game_over = True
+        while game_over:
             for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    running = False
-                    flappy = False
-            # Controls -- Space = jump; q, escape = quit
-                if event.type == KEYDOWN and event.key == K_SPACE:
-                    running = False
-                    flappy = True
-                    player.alive = True
-                    pygame.mixer.Sound.play(restart_sound)
-                elif event.type == KEYDOWN and (event.key == K_q or K_ESCAPE):
+                if event.type == pygame.QUIT or (event.type == KEYDOWN and (event.key == K_ESCAPE or event.key == K_q)):
                     pygame.quit()
-                    return points
-                    #sys.exit()
-                    running = False
-                    flappy = False
+                    if (highest_score >= points):
+                        return highest_score
+                    else:
+                        return points
+                elif event.type == KEYDOWN and event.key == K_SPACE:
+                    if (highest_score <= points):
+                        highest_score = points
+                    points = 0
+                    game_over = False
+                    running = True
+                    pygame.mixer.Sound.play(restart_sound)
+            
             #loads background image into game
             screen.fill([255, 255, 255])
             screen.blit(bg.image, bg.rect)
@@ -297,10 +294,9 @@ def Flappy_Game():
             lose(str(points))
             pygame.display.flip()
             pipes = []
-    print(points)
+    
     #exits game window
     pygame.quit()
-
     #code source: https://realpython.com/pygame-a-primer/
     #code source: https://stackoverflow.com/questions/28005641/how-to-add-a-background-image-into-pygame
     #sounds source: https://opengameart.org/content/512-sound-effects-8-bit-style

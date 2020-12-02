@@ -177,7 +177,7 @@ def PongGame():
                 final_score = 0
 
 
-StartMenu()
+def StartMenu():
     screen = turtle.Screen()
     startmenu = turtle.Turtle()
     startmenu.hideturtle()

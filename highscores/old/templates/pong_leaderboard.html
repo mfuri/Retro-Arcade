@@ -1,0 +1,34 @@
+<!--
+CEN4090L Project
+Author: Andrew Lindsay
+file: pong_leaderboard.html
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pong Highscores</title>
+</head>
+<body>
+<center>
+    <h1> Pong Highscores</h1>
+    <table border="1">
+        <thead>
+        <td>Username</td>
+        <td>Score</td>
+        <td>Date</td>
+        </thead>
+
+        {% for row in rows %}
+        <tr>
+            <td>{{row['Username']}}</td>
+            <td>{{row['Score']}}</td>
+            <td>{{row['Date']}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+<br>
+    <a href="/">Back to Home</a><br>
+</center>
+</body>
+</html>

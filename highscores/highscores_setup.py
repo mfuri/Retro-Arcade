@@ -5,23 +5,23 @@
 import sqlite3
 from sqlite3 import Error
 
-database = "highscores/retro-arcade.db"
+database = "retro-arcade.db"
 
 sql_create_game_table = """CREATE TABLE IF NOT EXISTS "game" (
-                            (
+
                                 gid integer not null
                                     constraint game_pk
                                         primary key autoincrement,
-                                title text "")
-                                
+                                title text "");
+
                                     create unique index game_gid_uindex
                                         on game (gid);
-                                    
+
                                     create unique index game_title_uindex
-                                        on game (title));"""
+                                        on game (title);"""
 
 sql_create_pong_table = """CREATE TABLE IF NOT EXISTS "pong" (
-                            (
+
                                 id text(40) not null
                                 primary key,
                                 max integer(20),
@@ -30,23 +30,21 @@ sql_create_pong_table = """CREATE TABLE IF NOT EXISTS "pong" (
                                 "limit" int);"""
 
 sql_create_user_table = """CREATE TABLE IF NOT EXISTS "user" (
-                           https://afclinic.sharepoint.com/:b:/s/AMCCWalk-UpTestingSiteCOVID-19/EYJg4QorWw9HrtEtQ16Co1YBuL9O4K6rxuboz-wjxNspbw?e=DnmeOe
                                 username text not null,
-                                password text default "password",
+                                password text,
                                 favorites text,
                                 uid integer not null
                                 constraint user_pk
-                                primary key autoincrement)
-                                
+                                primary key autoincrement);
+
                                 create unique index user_uid_uindex
                                     on user (uid);
-                                    
+
                                 create unique index user_username_uindex
-                                        on user (username)); """
+                                        on user (username); """
 
-
-sql_create_user_history_table = """CREATE TABLE IF NOT EXISTS "user_history_pong" (
-                            (
+sql_create_user_pong_history_table = """CREATE TABLE IF NOT EXISTS "user_top5_pong" (
+                                uid int unique primary key, 
                                 hs_1 int,
                                 hs_2 int,
                                 hs_3 int,
@@ -88,7 +86,7 @@ def setup():
         create_table(conn, sql_create_game_table)  # create game table
         create_table(conn, sql_create_pong_table)  # create pong table
         create_table(conn, sql_create_user_table)  # create user table
-        create_table(conn, sql_create_user_table)  # create user_history table
+        create_table(conn, sql_create_user_pong_history_table)  # create user_history table
 
     else:
         print("Error! cannot create the database connection.")

@@ -1,10 +1,14 @@
 
 
 import pygame
+from pygame.locals import *
 #Seth Polen
 #switched because turtle wasn't very intuitive with start screen
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 0413a586a184dfc1bbda63e14b6eec3b64b81d52
 def PongGame():
 	pygame.init()
 	clock = pygame.time.Clock()
@@ -25,10 +29,7 @@ def PongGame():
 	player_speed = 0
 	AI_Speed = 6.25
 
-
 	thefont = pygame.font.Font(None, 36)
-
-
 
 	bg_color = pygame.Color(0,0,0)
 	paddlecolor = (255, 255, 255)
@@ -38,17 +39,12 @@ def PongGame():
 	x_speed = 7
 	y_ball_speed = 7
 
-
-
-	
 	#######startmenu #######
 	def start():
 		# will use thefont
 		start_text = thefont.render("Press Space to Start (ESC to Quit)", True, (255, 255, 255))
 		start_rect = start_text.get_rect(center = ((screen_width/2), (screen_height/2)))
 		screen.blit(start_text, start_rect)
-
-
 
 	######### Main Loop #########
 
@@ -66,8 +62,9 @@ def PongGame():
 			pygame.display.flip()
 				
 		for event in pygame.event.get():
-			if event.type == pygame.QUIT:
+			if event.type == pygame.QUIT or (event.type == KEYDOWN and (event.key == K_ESCAPE or event.key == K_q)):
 				pygame.quit()
+				return paddle1_score
 			if event.type == pygame.KEYDOWN:
 				if event.key == pygame.K_DOWN:
 					player_speed += 7
@@ -144,3 +141,7 @@ def PongGame():
 		clock.tick(50)
 
 
+<<<<<<< HEAD
+=======
+#PongGame()
+>>>>>>> 0413a586a184dfc1bbda63e14b6eec3b64b81d52
