@@ -5,9 +5,6 @@ import pygame
 #switched because turtle wasn't very intuitive with start screen
 
 
-
-
-
 def PongGame():
 	pygame.init()
 	clock = pygame.time.Clock()
@@ -95,11 +92,11 @@ def PongGame():
 		screen.blit(right_text, (660, 50))
 		pygame.display.update()
 
-		ball.x += 7
-		ball.y += 7
+		ball.x += x_speed
+		ball.y += y_ball_speed
 		
 		######ball bounce#######
-		if ball.top <= 0 or ball.bottom >= screen_height:
+		if ball.top <= 0 or ball.bottom >= 800:
 			y_ball_speed *= -1
 		if ball.left <= 0:
 			ball.center = (screen_width/2, screen_height/2)
@@ -126,18 +123,24 @@ def PongGame():
 			paddle1.bottom = screen_height	
 
 		#####AI MOVEMENT#####
-			if paddle2.top < ball.y:
-				paddle2.top += AI_Speed
-			if paddle2.bottom > ball.y:
-				paddle2.bottom -= AI_Speed
-			if paddle2.top <= 0:
-				paddle2.top = 0
-			if paddle2.bottom >= screen_height:
-				paddle2.bottom = screen_height
+		if paddle2.top < ball.y:
+			paddle2.top += AI_Speed
+		if paddle2.bottom > ball.y:
+			paddle2.bottom -= AI_Speed
+		if paddle2.top <= 0:
+			paddle2.top = 0
+		if paddle2.bottom >= screen_height:
+			paddle2.bottom = screen_height
+			
 		
-		
-			pygame.display.flip()
-			clock.tick(50)
+		if paddle1_score == 10:		# computer won
+			finalscore = paddle1_score - paddle2_score
+			return finalscore
+		elif paddle2_score == 10:	# player
+			finalscore = paddle2_score - paddle1_score
+			return finalscore
+	
+		pygame.display.flip()
+		clock.tick(50)
 
 
-PongGame()
