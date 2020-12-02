@@ -31,9 +31,6 @@ cursor = None
 DEBUG = True
 
 
-
-
-
 def get_high_scores(table):
     query = cursor.execute("SELECT * FROM " + table)
     output = cursor.fetchall()
@@ -178,7 +175,7 @@ class Player:
     def register(self, register_uname, pwd):
         _Username = register_uname
         _Pass = pwd
-# ##### SOME POP UP FOR THIS? ############
+        # ##### SOME POP UP FOR THIS? ############
         if self.invalid_username(register_uname):
             if DEBUG:
                 print("Error: Username can only contain alphanumeric characters.")
@@ -188,7 +185,8 @@ class Player:
                            (_Username, _Pass))
             conn.commit()  # finalize transaction
             if DEBUG:
-                print("[SQLite] Success: Added username: ", player.get_username(), "\t with password: ", player.get_password())
+                print("[SQLite] Success: Added username: ", player.get_username(), "\t with password: ",
+                      player.get_password())
 
     def login(self, login_uname, pwd):
         if self._is_logged_in:
@@ -238,20 +236,30 @@ class Player:
         # pull from db and print out in pop-up window
         return_list = []
 
-        # pull flappy bird data
-        cursor.execute("SELECT username, score AS f_score, STRFTIME('%d/%m/%Y', datetime) AS f_date FROM flappy WHERE username=? ORDER BY score LIMIT 50 OFFSET 1", (self.get_username(),))
-        cursor.execute("SELECT MAX(score) FROM flappy WHERE username = ?", (self.get_username(),))
+        # query the database for the player's top 5 scores in Flappy Bird
+        cursor.execute(
+            "SELECT username, score AS f_score, STRFTIME('%d/%m/%Y', datetime) AS f_date FROM flappy WHERE username=? ORDER BY score LIMIT 5 OFFSET 1",
+            (self.get_username(),))
+        # cursor.execute("SELECT MAX(score) FROM flappy WHERE username = ?", (self.get_username(),))
         f_rows = cursor.fetchall()
         conn.commit()
 
-        #print("FLAPPY BIRD USER VIEW STATS: \n")
+        if f_rows != []:
+            for element in f_rows:
+                return_list.append(element)
+        else:
+            return_list.append(0)
+
+        # print("FLAPPY BIRD USER VIEW STATS: \n")
         if f_rows != []:
             for element in f_rows:
                 return_list.append(element[0])
         else:
             return_list.append(0)
         # pull space invaders data
-        cursor.execute("SELECT username, score AS sp_score, STRFTIME('%d/%m/%Y', datetime) AS sp_date FROM space WHERE username=? ORDER BY score LIMIT 50 OFFSET 1", (self.get_username(),))
+        cursor.execute(
+            "SELECT username, score AS sp_score, STRFTIME('%d/%m/%Y', datetime) AS sp_date FROM space WHERE username=? ORDER BY score LIMIT 5 OFFSET 1",
+            (self.get_username(),))
         sp_rows = cursor.fetchall()
         conn.commit()
 
@@ -262,10 +270,12 @@ class Player:
             return_list.append(0)
 
         # pull pong data
-        cursor.execute("SELECT username, score AS p_score, STRFTIME('%d/%m/%Y', date) AS p_date FROM pong WHERE username=? ORDER BY score LIMIT 50 OFFSET 1", (self.get_username(),))
+        cursor.execute(
+            "SELECT username, score AS p_score, STRFTIME('%d/%m/%Y', date) AS p_date FROM pong WHERE username=? ORDER BY score LIMIT 5 OFFSET 1",
+            (self.get_username(),))
         p_rows = cursor.fetchall()
         conn.commit()
-        
+
         if p_rows != []:
             for element in p_rows:
                 return_list.append(element[0])
@@ -273,7 +283,9 @@ class Player:
             return_list.append(0)
 
         # pull snake data
-        cursor.execute("SELECT username, score AS sn_score, STRFTIME('%d/%m/%Y', date) AS sn_date FROM pong WHERE username=? ORDER BY score LIMIT 50 OFFSET 1", (self.get_username(),))
+        cursor.execute(
+            "SELECT username, score AS sn_score, STRFTIME('%d/%m/%Y', date) AS sn_date FROM pong WHERE username=? ORDER BY score LIMIT 5 OFFSET 1",
+            (self.get_username(),))
         sn_rows = cursor.fetchall()
         conn.commit()
 
@@ -283,10 +295,8 @@ class Player:
         else:
             return_list.append(0)
 
-        #returns list with scores ordered: flappy bird, space invaders, pong, snake
+        # returns list with scores ordered: flappy bird, space invaders, pong, snake
         return return_list
-
-
 
 
 # Create the Main Window
@@ -449,15 +459,25 @@ while True:
         elif event == 'My Stats':
             if DEBUG:
                 print("[USER] VIEW STATS")
+            # stats_list = player.view_stats()
+            # stats_string = player.get_username() + "'s High Scores\n*******************\nFlappy Bird:\t" + str(stats_list[0]) + ' ' + str(stats_list[1]) + (stats_list[2]) + "\nSpace Invaders:\t" + str(stats_list[1]
+            #         ) + "\nPong:\t" + str(stats_list[2]
+            #         )  + "\nSnake:\t" + str(stats_list[3])
             stats_list = player.view_stats()
-            stats_string = player.get_username() + "'s High Scores\n*******************\nFlappy Bird:\t" + str(stats_list[0]
-                    ) + "\nSpace Invaders:\t" + str(stats_list[1]
-                    ) + "\nPong:\t" + str(stats_list[2]
-                    )  + "\nSnake:\t" + str(stats_list[3])
+            stats_string = player.get_username() + "'s High Scores\n*******************\n\tFlappy " \
+                                                   "Bird:\n\t-------------------------\n\t 1. " + str(stats_list[0]) \
+                           + "\n\t 2. \n\t 3. \n\t 4. \n\t 5. " + "\n\n\tSpace " \
+                                                                  "Invaders:\n\t-------------------------\n\t 1. " + \
+                           str(stats_list[1]) + "\n\t 2. \n\t 3. \n\t 4. \n\t 5. " + \
+                           "\n\n\tPong:\n\t-------------------------\n\t 1. " + str(stats_list[2]) + "\n\t 2. \n\t 3. "\
+                                                                                                     "\n\t 4. \n\t 5." \
+                                                                                                     " " + \
+                           "\n\n\tSnake:\n\t-------------------------\n\t 1. " + str(stats_list[3]) + "\n\t 2. \n\t " \
+                                                                                                      "3. \n\t 4. " \
+                                                                                                      "\n\t 5. "
+            sg.popup_scrolled(stats_string, title=player.get_username(), font=16)
 
-            sg.popup_scrolled(stats_string, title = player.get_username(), font = 16)
-            
-            #sg.popup_scrolled(stats_string, title=self.get_username(), font=16)
+            # sg.popup_scrolled(stats_string, title=self.get_username(), font=16)
         elif event == 'High Scores':
             print("[USER] Overall High scores")
 
