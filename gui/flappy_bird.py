@@ -207,7 +207,7 @@ def Flappy_Game():
             for event in pygame.event.get():
                 if event.type == pygame.QUIT or (event.type == KEYDOWN and (event.key == K_ESCAPE or event.key == K_q)):
                     pygame.quit()
-                    return points
+                    return highest_score
                     #sys.exit()
                 elif event.type == KEYDOWN and event.key == K_SPACE:
                     player.jump()
@@ -227,6 +227,8 @@ def Flappy_Game():
             pygame.display.flip()
         
         while running:
+            if highest_score <= points:
+                highest_score = points
             #turn false when user hits pipe or the ground or the top of the screen
             for event in pygame.event.get():
                 if event.type == pygame.QUIT or (event.type == KEYDOWN and (event.key == K_ESCAPE or event.key == K_q)):
@@ -275,10 +277,9 @@ def Flappy_Game():
             for event in pygame.event.get():
                 if event.type == pygame.QUIT or (event.type == KEYDOWN and (event.key == K_ESCAPE or event.key == K_q)):
                     pygame.quit()
-                    if (highest_score >= points):
-                        return highest_score
-                    else:
-                        return points
+                    if (highest_score <= points):
+                        highest_score = points
+                    return highest_score
                 elif event.type == KEYDOWN and event.key == K_SPACE:
                     if (highest_score <= points):
                         highest_score = points
