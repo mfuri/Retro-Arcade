@@ -230,6 +230,7 @@ def SI_Game():
     highest_score = 0
 
     while True:
+        rockets = []
         alien = Alien()
         aliens = []
         alien.create_alien_list(aliens)
@@ -265,8 +266,9 @@ def SI_Game():
                 if event.type == pygame.QUIT or (event.type == KEYDOWN and (event.key == K_ESCAPE or event.key == K_q)):
                     pygame.quit()
                     if level + 1 >= highest_score:
-                        return level + 1
-                    #sys.exit()
+                        highest_score = level + 1
+                    return highest_score
+                    
                 elif event.type == KEYDOWN and event.key == K_SPACE:
                     rocket = Rocket(ship.rect.x+11, ship.rect.y)
                     rocket_list.add(rocket)
@@ -284,24 +286,24 @@ def SI_Game():
             #Checks if lost
             #ship.check_alive(aliens)
             if (running == False):
-                if level >= highest_score:
-                    highest_score = level
+                if level + 1 >= highest_score:
+                    highest_score = level + 1
                 lose_screen = True
 
             if len(aliens) == 0:
                 next_level = True
                 level += 1
-                if level >= highest_score:
-                    highest_score = level
+                if level + 1 >= highest_score:
+                    highest_score = level + 1
                 while next_level:
                     for event in pygame.event.get():
                         if event.type == pygame.QUIT or (event.type == KEYDOWN and (event.key == K_ESCAPE or event.key == K_q)):
                             pygame.quit()
-                            if (old_level >= level):
-                                return old_level
-                            else:
-                                return level
-                            #sys.exit()
+                            if (highest_score <= level + 1):
+                                highest_score = level + 1
+                            
+                            return highest_score
+                            
                         elif event.type == KEYDOWN and event.key == K_SPACE:
                             if (old_level <= level):
                                 old_level = level
