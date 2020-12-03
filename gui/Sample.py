@@ -234,11 +234,14 @@ class Player:
 
     def view_stats(self):
         # pull from db and print out in pop-up window
-        return_list = []
+        fl_return_list = []
+        sp_return_list = []
+        po_return_list = []
+        sn_return_list = []
 
         # query the database for the player's top 5 scores in Flappy Bird
         cursor.execute(
-            "SELECT username, score AS f_score, STRFTIME('%d/%m/%Y', datetime) AS f_date FROM flappy WHERE username=? ORDER BY score LIMIT 5 OFFSET 1",
+            "SELECT username, score AS f_score, STRFTIME('%d/%m/%Y', datetime) AS f_date FROM flappy WHERE username=? ORDER BY score DESC LIMIT 5 OFFSET 1",
             (self.get_username(),))
         # cursor.execute("SELECT MAX(score) FROM flappy WHERE username = ?", (self.get_username(),))
         f_rows = cursor.fetchall()
@@ -246,51 +249,51 @@ class Player:
 
         if f_rows != []:
             for element in f_rows:
-                return_list.append(element)
+                fl_return_list.append(element)
         else:
-            return_list.append(0)
+            fl_return_list.append((0,0,0))
 
         # pull space invaders data
         cursor.execute(
-            "SELECT username, score AS sp_score, STRFTIME('%d/%m/%Y', datetime) AS sp_date FROM space WHERE username=? ORDER BY score LIMIT 5 OFFSET 1",
+            "SELECT username, score AS sp_score, STRFTIME('%d/%m/%Y', datetime) AS sp_date FROM space WHERE username=? ORDER BY score DESC LIMIT 5 OFFSET 1",
             (self.get_username(),))
         sp_rows = cursor.fetchall()
         conn.commit()
 
         if sp_rows != []:
             for element in sp_rows:
-                return_list.append(element[0])
+                sp_return_list.append(element)
         else:
-            return_list.append(0)
+            sp_return_list.append((0,0,0))
 
         # pull pong data
         cursor.execute(
-            "SELECT username, score AS p_score, STRFTIME('%d/%m/%Y', datetime) AS p_date FROM pong WHERE username=? ORDER BY score LIMIT 5 OFFSET 1",
+            "SELECT username, score AS p_score, STRFTIME('%d/%m/%Y', datetime) AS p_date FROM pong WHERE username=? ORDER BY score DESC LIMIT 5 OFFSET 1",
             (self.get_username(),))
         p_rows = cursor.fetchall()
         conn.commit()
 
         if p_rows != []:
             for element in p_rows:
-                return_list.append(element[0])
+                po_return_list.append(element)
         else:
-            return_list.append(0)
+            po_return_list.append((0,0,0))
 
         # pull snake data
         cursor.execute(
-            "SELECT username, score AS sn_score, STRFTIME('%d/%m/%Y', datetime) AS sn_date FROM snake WHERE username=? ORDER BY score LIMIT 5 OFFSET 1",
+            "SELECT username, score AS sn_score, STRFTIME('%d/%m/%Y', datetime) AS sn_date FROM snake WHERE username=? ORDER BY score DESC LIMIT 5 OFFSET 1",
             (self.get_username(),))
         sn_rows = cursor.fetchall()
         conn.commit()
 
         if sn_rows != []:
             for element in sn_rows:
-                return_list.append(element[0])
+                sn_return_list.append(element)
         else:
-            return_list.append(0)
+            sn_return_list.append((0,0,0))
 
         # returns list with scores ordered: flappy bird, space invaders, pong, snake
-        return return_list
+        return fl_return_list, sp_return_list, po_return_list, sn_return_list
 
 
 # Create the Main Window
@@ -380,7 +383,7 @@ while True:
 
         if event == "Flappy Bird":
             print("[GAME] PLAY FLAPPY BIRD")
-            # RETURNS SCORE!!!
+            
             score = flappy_bird.Flappy_Game()
 
             print("[GAME] Thanks for playing Flappy Bird! Score: ", score)
@@ -453,25 +456,48 @@ while True:
         elif event == 'My Stats':
             if DEBUG:
                 print("[USER] VIEW STATS")
+
             # stats_list = player.view_stats()
             # stats_string = player.get_username() + "'s High Scores\n*******************\nFlappy Bird:\t" + str(stats_list[0]) + ' ' + str(stats_list[1]) + (stats_list[2]) + "\nSpace Invaders:\t" + str(stats_list[1]
             #         ) + "\nPong:\t" + str(stats_list[2]
             #         )  + "\nSnake:\t" + str(stats_list[3])
-            stats_list = player.view_stats()
+            fl_stats_list, sp_stats_list, po_stats_list, sn_stats_list = player.view_stats()
             stats_string = player.get_username() + "'s High Scores\n*******************\n\tFlappy " \
-                                                   "Bird:\n\t-------------------------\n\t 1. " + str(stats_list[0]) \
-                           + "\n\t 2. \n\t 3. \n\t 4. \n\t 5. " + "\n\n\tSpace " \
-                                                                  "Invaders:\n\t-------------------------\n\t 1. " + \
-                           str(stats_list[1]) + "\n\t 2. \n\t 3. \n\t 4. \n\t 5. " + \
-                           "\n\n\tPong:\n\t-------------------------\n\t 1. " + str(stats_list[2]) + "\n\t 2. \n\t 3. "\
-                                                                                                     "\n\t 4. \n\t 5." \
-                                                                                                     " " + \
-                           "\n\n\tSnake:\n\t-------------------------\n\t 1. " + str(stats_list[3]) + "\n\t 2. \n\t " \
-                                                                                                      "3. \n\t 4. " \
-                                                                                                      "\n\t 5. "
+                                                     "Bird:\n\t-------------------------"
+            while len(fl_stats_list) != 5:
+                fl_stats_list.append((0,0,0))
+            counter = 1
+            for score in fl_stats_list:
+                stats_string += "\n\t " + str(counter) + ". " + str(score[1])
+                counter += 1
+
+            stats_string += "\n\n\tSpace Invaders:\n\t-------------------------"
+            while len(sp_stats_list) != 5:
+                sp_stats_list.append((0,0,0))
+            counter = 1
+            for score in sp_stats_list:
+                stats_string += "\n\t " + str(counter) + ". " + str(score[1])
+                counter += 1
+
+            stats_string += "\n\n\tPong:\n\t-------------------------"
+            while len(po_stats_list) != 5:
+                po_stats_list.append((0,0,0))
+            counter = 1
+            for score in po_stats_list:
+                stats_string += "\n\t " + str(counter) + ". " + str(score[1])
+                counter += 1
+
+            stats_string += "\n\n\tSnake:\n\t-------------------------"
+            while len(sn_stats_list) != 5:
+                sn_stats_list.append((0,0,0))
+            counter = 1
+            for score in sn_stats_list:
+                stats_string += "\n\t " + str(counter) + ". " + str(score[1])
+                counter += 1
+                                                                
             sg.popup_scrolled(stats_string, title=player.get_username(), font=16)
 
-            # sg.popup_scrolled(stats_string, title=self.get_username(), font=16)
+       
         elif event == 'High Scores':
             print("[USER] Overall High scores")
 
