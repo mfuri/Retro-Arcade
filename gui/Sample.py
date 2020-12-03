@@ -241,7 +241,7 @@ class Player:
 
         # query the database for the player's top 5 scores in Flappy Bird
         cursor.execute(
-            "SELECT username, score AS f_score, STRFTIME('%d/%m/%Y', datetime) AS f_date FROM flappy WHERE username=? ORDER BY score DESC LIMIT 5 OFFSET 1",
+            "SELECT username, score AS f_score, STRFTIME('%d/%m/%Y', datetime) AS f_date FROM flappy WHERE username=? ORDER BY score DESC LIMIT 5",
             (self.get_username(),))
         # cursor.execute("SELECT MAX(score) FROM flappy WHERE username = ?", (self.get_username(),))
         f_rows = cursor.fetchall()
@@ -255,7 +255,7 @@ class Player:
 
         # pull space invaders data
         cursor.execute(
-            "SELECT username, score AS sp_score, STRFTIME('%d/%m/%Y', datetime) AS sp_date FROM space WHERE username=? ORDER BY score DESC LIMIT 5 OFFSET 1",
+            "SELECT username, score AS sp_score, STRFTIME('%d/%m/%Y', datetime) AS sp_date FROM space WHERE username=? ORDER BY score DESC LIMIT 5",
             (self.get_username(),))
         sp_rows = cursor.fetchall()
         conn.commit()
@@ -268,7 +268,7 @@ class Player:
 
         # pull pong data
         cursor.execute(
-            "SELECT username, score AS p_score, STRFTIME('%d/%m/%Y', datetime) AS p_date FROM pong WHERE username=? ORDER BY score DESC LIMIT 5 OFFSET 1",
+            "SELECT username, score AS p_score, STRFTIME('%d/%m/%Y', datetime) AS p_date FROM pong WHERE username=? ORDER BY score DESC LIMIT 5",
             (self.get_username(),))
         p_rows = cursor.fetchall()
         conn.commit()
@@ -281,7 +281,7 @@ class Player:
 
         # pull snake data
         cursor.execute(
-            "SELECT username, score AS sn_score, STRFTIME('%d/%m/%Y', datetime) AS sn_date FROM snake WHERE username=? ORDER BY score DESC LIMIT 5 OFFSET 1",
+            "SELECT username, score AS sn_score, STRFTIME('%d/%m/%Y', datetime) AS sn_date FROM snake WHERE username=? ORDER BY score DESC LIMIT 5",
             (self.get_username(),))
         sn_rows = cursor.fetchall()
         conn.commit()
