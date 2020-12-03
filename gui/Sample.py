@@ -1,14 +1,9 @@
-##################################################################
-#                       TO DO: 12-01-2020                        #
-# -------------------------------------------------------------- #
-#   1. [HIGHEST PRIORITY]  Fix bugs in Pong                      #
-#   2. [HIGH PRIORITY]  Finish writing HS queries                #
-#   3. [MED. PRIORITY]  Fix Encryption                           #
-#   4. [MED. PRIORITY]  Try to "break" program for debugging     #
-#   5. [LOW PRIORITY]   Check results of return login
-#   5. [LOW PRIORITY]   Clean up code & add comments             #
-#   6. [LOWEST PRIORITY] Improve GUI aesthetics                  #
-##################################################################
+##################################################
+#                Retro Arcade                    #
+# ---------------------------------------------- #
+#   file: Sample.py                              #
+#   description: Main driver                     #
+##################################################
 import base64
 import sqlite3
 import PySimpleGUI as sg
@@ -66,13 +61,28 @@ def get_top_player(table):
 
 
 def encrypt(pwd):
-    print("[Encrypt] Plain Password: ", pwd)
+    if DEBUG:
+        print("[Encrypt] Plain Password: ", pwd)
     pwd_ascii = pwd.encode("ascii")  # set encoding to ascii
     pwd_bytes = base64.b64encode(pwd_ascii)  # convert password to bytes
-    print("[Encrypt] Password in bytes: ", pwd_bytes)
+    if DEBUG:
+        print("[Encrypt] Password in bytes: ", pwd_bytes)
     encrypted_password = cipher_suite.encrypt(pwd_bytes)  # Encrypt with AES
-    print("[Encrypt] Encrypted Password: ", encrypted_password)
+    if DEBUG:
+        print("[Encrypt] Encrypted Password: ", encrypted_password)
     return encrypted_password
+
+    #pwd_ascii = pwd.encode("ascii")  # set encoding to ascii
+    #pwd_bytes = base64.b64encode(pwd_ascii)  # convert password to bytes
+    #if DEBUG:
+    #    print("REGISTER[Encrypt] Password in bytes: ", pwd_bytes)
+    #encrypted_pwd = cipher_suite.encrypt(pwd_bytes)
+
+    #print("REGISTER[Encrypt] Encrypted password: ", encrypted_pwd)
+    #pwd_bytes = cipher_suite.decrypt(encrypted_pwd)
+    #pwd_d_bytes = base64.standard_b64decode(pwd_bytes)
+    #pwd_d_plain = pwd_d_bytes.decode('ascii')
+    #print("REGISTER[Encrypt] Plain text: ", pwd_d_plain)
 
 
 main_window_hidden = False
@@ -150,13 +160,12 @@ class Player:
     def get_login_status(self):
         return self._is_logged_in
 
-    @staticmethod
-    def invalid_username(desired_username):
+    def invalid_username(self, desired_username):
         if any(not c.isalnum() for c in desired_username):
             if DEBUG:
                 print("Username contains invalid characters. ONLY ALPHANUM ALLOWED!")
-            return False
-        return True
+            return True
+        return False
 
     def set_username(self, set_string):
         self._User = set_string
@@ -173,8 +182,8 @@ class Player:
             self._is_logged_in = False
 
     def register(self, register_uname, pwd):
-        _Username = register_uname
-        _Pass = pwd
+        self._User = register_uname
+        self._Pass = pwd
         # ##### SOME POP UP FOR THIS? ############
         if self.invalid_username(register_uname):
             if DEBUG:
@@ -182,7 +191,7 @@ class Player:
             return 4
         else:
             cursor.execute("INSERT OR IGNORE INTO user(username, password) VALUES(?,?);",
-                           (_Username, _Pass))
+                           (self._User, self._Pass,))
             conn.commit()  # finalize transaction
             if DEBUG:
                 print("[SQLite] Success: Added username: ", player.get_username(), "\t with password: ",
@@ -197,7 +206,7 @@ class Player:
             else:
                 cursor.execute(
                     "SELECT DISTINCT username, password FROM user WHERE user.username = ? AND user.password = ?",
-                    (login_uname, pwd))
+                    (login_uname, pwd,))
                 login_rows = cursor.fetchall()
                 conn.commit()
                 num_rows = len(login_rows)
@@ -599,7 +608,8 @@ while True:
         main_window_hidden = True
 
     elif event == 'Sign Up':
-        print("sign up here")
+        if DEBUG:
+            print("sign up here")
 
         signup_layout = [[sg.Text("Username", font=16), sg.InputText('', key='Username', font=16)],
                          [sg.Text('Password  ', font=16), sg.InputText('', key='Password', password_char='*', font=16)],
@@ -648,11 +658,11 @@ while True:
                 player.register(Username, Password)
 
                 player.set_login_status("True")
-                sql_signup_query = cursor.execute("INSERT OR IGNORE INTO user(username, password) VALUES(?,?);",
-                                                  (player.get_username(), player.get_password(),))
-                conn.commit()  # finalize transaction
-                print("[SQLite] Success: Added username: ", player.get_username(), "\t with password: ",
-                      player.get_password())
+                #sql_signup_query = cursor.execute("INSERT OR IGNORE INTO user(username, password) VALUES(?,?);",
+                #                                  (player.get_username(), player.get_password(),))
+                #conn.commit()  # finalize transaction
+                #print("[SQLite] Success: Added username: ", player.get_username(), "\t with password: ",
+                 #     player.get_password())
 
         # CHECK FOR COMPLETE FIELDS FOR SIGN IN
         else:
