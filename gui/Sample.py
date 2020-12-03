@@ -105,7 +105,7 @@ print("[System] PROJECT ROOT DIR: ", ROOT_DIR)
 
 # connect to db
 try:
-    conn = sqlite3.connect(join(ROOT_DIR, 'old_highscore/retro-arcade.db'))
+    conn = sqlite3.connect(join(ROOT_DIR, 'highscores/retro-arcade.db'))
     cursor = conn.cursor()
     print("[SQLite] Successfully connected to the database.")
 
