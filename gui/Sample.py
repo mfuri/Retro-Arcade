@@ -32,7 +32,7 @@ DEBUG = True
 
 
 def get_top_players(table):
-    cursor.execute("SELECT username, score, datetime FROM " + table + " GROUP BY username, score ORDER BY score DESC LIMIT 5 OFFSET 1;")
+    cursor.execute("SELECT username, score, datetime FROM " + table + " GROUP BY username, score ORDER BY score DESC LIMIT 25;")
     row = cursor.fetchall()
     conn.commit()
     return row
@@ -46,7 +46,7 @@ def view_stats(self):
 
     # query the database for the player's top 5 scores in Flappy Bird
     cursor.execute(
-        "SELECT username, score AS f_score, STRFTIME('%d/%m/%Y', datetime) AS f_date FROM flappy WHERE username=? ORDER BY score DESC LIMIT 5 OFFSET 1;",
+        "SELECT username, score AS f_score, STRFTIME('%d/%m/%Y', datetime) AS f_date FROM flappy WHERE username=? ORDER BY score DESC LIMIT 5;",
         (self.get_username(),))
     f_rows = cursor.fetchall()
     conn.commit()
@@ -59,7 +59,7 @@ def view_stats(self):
 
     # query the database for the player's top 5 scores in Space Invaders
     cursor.execute(
-        "SELECT username, score AS sp_score, STRFTIME('%d/%m/%Y', datetime) AS sp_date FROM space WHERE username=? ORDER BY score DESC LIMIT 5 OFFSET 1;",
+        "SELECT username, score AS sp_score, STRFTIME('%d/%m/%Y', datetime) AS sp_date FROM space WHERE username=? ORDER BY score DESC LIMIT 5;",
         (self.get_username(),))
     sp_rows = cursor.fetchall()
     conn.commit()
@@ -72,7 +72,7 @@ def view_stats(self):
 
     # query the database for the player's top 5 scores in Pong
     cursor.execute(
-        "SELECT username, score AS p_score, STRFTIME('%d/%m/%Y', datetime) AS p_date FROM pong WHERE username=? ORDER BY score DESC LIMIT 5 OFFSET 1;",
+        "SELECT username, score AS p_score, STRFTIME('%d/%m/%Y', datetime) AS p_date FROM pong WHERE username=? ORDER BY score DESC LIMIT 5;",
         (self.get_username(),))
     p_rows = cursor.fetchall()
     conn.commit()
@@ -85,7 +85,7 @@ def view_stats(self):
 
     # query the database for the player's top 5 scores in Snake
     cursor.execute(
-        "SELECT username, score AS sn_score, STRFTIME('%d/%m/%Y', datetime) AS sn_date FROM snake WHERE username=? ORDER BY score DESC LIMIT 5 OFFSET 1;",
+        "SELECT username, score AS sn_score, STRFTIME('%d/%m/%Y', datetime) AS sn_date FROM snake WHERE username=? ORDER BY score DESC LIMIT 5;",
         (self.get_username(),))
     sn_rows = cursor.fetchall()
     conn.commit()
@@ -107,7 +107,9 @@ def view_leaderboard():
     lb_sn_return_list = []
 
     # query the database for the Top 5 scores in Flappy Bird
+    
     lb_f_rows = get_top_players("flappy")
+    
     if lb_f_rows:
         for f_element in lb_f_rows:
             lb_fl_return_list.append(f_element)
@@ -116,7 +118,8 @@ def view_leaderboard():
 
     # query the database for the Top 5 scores in Space Invaders
     lb_space_rows = get_top_players("space")
-    if lb_space_rows:
+   
+    if lb_space_rows != []:
         for sp_element in lb_space_rows:
             lb_sp_return_list.append(sp_element)
     else:
@@ -124,24 +127,22 @@ def view_leaderboard():
 
     # query the database for the Top 5 scores in Pong
     lb_po_rows = get_top_players("pong")
-    if lb_po_rows:
+ 
+    if lb_po_rows != []:
         for po_element in lb_po_rows:
-            lb_sp_return_list.append(po_element)
+            lb_po_return_list.append(po_element)
     else:
-        lb_sp_return_list.append((0, 0, 0))
-
+        lb_po_return_list.append((0, 0, 0))
+   
     # query the database for the Top 5 scores in Snake
-    cursor.execute(
-        "SELECT username, score AS sn_score, STRFTIME('%d/%m/%Y', datetime) AS sn_date FROM snake ORDER BY score DESC LIMIT 5 OFFSET 1;",
-        )
-    lb_sn_rows = cursor.fetchall()
-    conn.commit()
+    lb_sn_rows = get_top_players("pong")
+   
     if lb_sn_rows:
         for sn_element in lb_sn_rows:
             lb_sn_return_list.append(sn_element)
     else:
         lb_sn_return_list.append((0, 0, 0))
-
+    
     # returns list with scores ordered: flappy bird, space invaders, pong, snake
     return lb_fl_return_list, lb_sp_return_list, lb_po_return_list, lb_sn_return_list
 
