@@ -15,7 +15,7 @@ def main():
 
 @app.route('/pong_leaderboard')
 def pong_hs():
-    con = sqlite3.connect("highscores/retro-arcade.db")
+    con = sqlite3.connect("old_highscore/retro-arcade.db")
     con.row_factory = sqlite3.Row
 
     cur = con.cursor()

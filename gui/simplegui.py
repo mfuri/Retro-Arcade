@@ -1,16 +1,9 @@
-import pygame
-import random
-import sys
-import pygame.freetype
-import os
 from os import environ
 environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 import PySimpleGUI as sg
 
 # import trinket as tk
-from pong import *
 #from space_invaders import *
-import flappy_bird
 
 sg.theme('Dark')
 
