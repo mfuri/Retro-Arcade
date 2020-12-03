@@ -250,12 +250,6 @@ class Player:
         else:
             return_list.append(0)
 
-        # print("FLAPPY BIRD USER VIEW STATS: \n")
-        if f_rows != []:
-            for element in f_rows:
-                return_list.append(element[0])
-        else:
-            return_list.append(0)
         # pull space invaders data
         cursor.execute(
             "SELECT username, score AS sp_score, STRFTIME('%d/%m/%Y', datetime) AS sp_date FROM space WHERE username=? ORDER BY score LIMIT 5 OFFSET 1",
@@ -271,7 +265,7 @@ class Player:
 
         # pull pong data
         cursor.execute(
-            "SELECT username, score AS p_score, STRFTIME('%d/%m/%Y', date) AS p_date FROM pong WHERE username=? ORDER BY score LIMIT 5 OFFSET 1",
+            "SELECT username, score AS p_score, STRFTIME('%d/%m/%Y', datetime) AS p_date FROM pong WHERE username=? ORDER BY score LIMIT 5 OFFSET 1",
             (self.get_username(),))
         p_rows = cursor.fetchall()
         conn.commit()
@@ -284,7 +278,7 @@ class Player:
 
         # pull snake data
         cursor.execute(
-            "SELECT username, score AS sn_score, STRFTIME('%d/%m/%Y', date) AS sn_date FROM pong WHERE username=? ORDER BY score LIMIT 5 OFFSET 1",
+            "SELECT username, score AS sn_score, STRFTIME('%d/%m/%Y', datetime) AS sn_date FROM snake WHERE username=? ORDER BY score LIMIT 5 OFFSET 1",
             (self.get_username(),))
         sn_rows = cursor.fetchall()
         conn.commit()
@@ -379,8 +373,7 @@ while True:
             except Error as error:
                 print("[SQLite] Signup query failed to fetch record. Error: ", error)
                 break
-
-    # NOTE: WHEN EXITING GAME, ENTIRE PROGRAM CLOSES -> FIX THIS
+            
     elif games_window_open:
         event, values = games_window.read()
         # DISPLAY GAMES
@@ -406,8 +399,7 @@ while True:
                 print("[SQLite] Flappy Bird HS added successfully.")
 
         elif event == "Pong":
-            print("PLAY PONG")
-            pygamepong.PongGame()  
+           
             print("[GAME] PLAY PONG")
             # returns score
             pong_score = pygamepong.PongGame()
