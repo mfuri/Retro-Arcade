@@ -131,6 +131,7 @@ def Snake():
         goal = Apple()
         while start:
             surface.fill(black)
+            pygame.display.update()
             for event in pygame.event.get():
                 if event.type == KEYDOWN:
                     if event.key == K_SPACE:
@@ -150,7 +151,7 @@ def Snake():
 
             font = pygame.font.Font(None, 30)
             text = font.render("Press Space to Start", True, white, black)
-            tRect = text.get_rect(center=((SCREEN_WIDTH / 2), (SCREEN_HEIGHT / 2) - 110))
+            tRect = text.get_rect(center=((SCREEN_WIDTH / 2), (SCREEN_HEIGHT / 2) - 85))
             screen.blit(text, tRect)
             pygame.display.flip()
 
