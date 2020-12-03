@@ -63,6 +63,7 @@ def PongGame():
 	start_screen = True
 	won = False
 	lost = False
+	highest_score = 0
 	while True:
 		while start_screen:
 			screen.fill((0, 0, 0))
@@ -70,7 +71,9 @@ def PongGame():
 			for event in pygame.event.get():
 				if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
 					pygame.quit()
-					return paddle1_score
+					if paddle1_score > highest_score:
+						highest_score = paddle1_score
+					return highest_score
 				elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
 					start_screen = False
 					running = True
@@ -91,7 +94,9 @@ def PongGame():
 			for event in pygame.event.get():
 				if event.type == pygame.QUIT or (event.type == KEYDOWN and (event.key == K_ESCAPE or event.key == K_q)):
 					pygame.quit()
-					return paddle1_score
+					if paddle1_score > highest_score:
+						highest_score = paddle1_score
+					return highest_score
 				if event.type == pygame.KEYDOWN:
 					if event.key == pygame.K_DOWN:
 						player_speed += 7
@@ -177,7 +182,9 @@ def PongGame():
 			for event in pygame.event.get():
 				if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
 					pygame.quit()
-					return paddle1_score
+					if paddle1_score > highest_score:
+						highest_score = paddle1_score
+					return highest_score
 				elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
 					start_screen = True
 					lost = False
@@ -190,7 +197,9 @@ def PongGame():
 			for event in pygame.event.get():
 				if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
 					pygame.quit()
-					return paddle1_score
+					if paddle1_score > highest_score:
+						highest_score = paddle1_score
+					return highest_score
 				elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
 					start_screen = True
 					won = False
