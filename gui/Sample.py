@@ -15,7 +15,8 @@ import pygamepong
 import flappy_bird
 import space_invaders
 import snake
-import datetime as datetime
+import datetime
+import string
 from os import environ
 from os.path import dirname, abspath, join
 from sqlite3 import Error
@@ -30,38 +31,119 @@ cursor = None
 DEBUG = True
 
 
-def get_high_scores(table):
-    query = cursor.execute("SELECT * FROM " + table)
-    output = cursor.fetchall()
+def get_top_players(table):
+    cursor.execute("SELECT username, score, datetime FROM " + table + " GROUP BY username, score ORDER BY score DESC LIMIT 5 OFFSET 1;")
+    row = cursor.fetchall()
+    conn.commit()
+    return row
+
+def view_stats(self):
+    # pull from db and print out in pop-up window
+    fl_return_list = []
+    sp_return_list = []
+    po_return_list = []
+    sn_return_list = []
+
+    # query the database for the player's top 5 scores in Flappy Bird
+    cursor.execute(
+        "SELECT username, score AS f_score, STRFTIME('%d/%m/%Y', datetime) AS f_date FROM flappy WHERE username=? ORDER BY score DESC LIMIT 5 OFFSET 1;",
+        (self.get_username(),))
+    f_rows = cursor.fetchall()
     conn.commit()
 
-    high_score = 0
-    player_name = ""
+    if f_rows:
+        for element in f_rows:
+            fl_return_list.append(element)
+    else:
+        fl_return_list.append((0, 0, 0))
 
-    for data in output:
-        if data[0] != '':
-            if data[1] >= high_score:
-                high_score = data[1]
-                player_name = data[0]
-
-    if high_score == 0:
-        score_date = None
-
-    return high_score, player_name
-
-
-def get_top_player(table):
-    # return sorted list of top players for specific game
-    query = cursor.execute("SELECT DISTINCT username, score FROM " + table + " ORDER BY score DESC LIMIT 10")
-    output = cursor.fetchall()
+    # query the database for the player's top 5 scores in Space Invaders
+    cursor.execute(
+        "SELECT username, score AS sp_score, STRFTIME('%d/%m/%Y', datetime) AS sp_date FROM space WHERE username=? ORDER BY score DESC LIMIT 5 OFFSET 1;",
+        (self.get_username(),))
+    sp_rows = cursor.fetchall()
     conn.commit()
 
-    player_list = []
-    for data in output:
-        if data[0] not in player_list:
-            player_list.append(data[0])
+    if sp_rows:
+        for element in sp_rows:
+            sp_return_list.append(element)
+    else:
+        sp_return_list.append((0, 0, 0))
 
-    return player_list
+    # query the database for the player's top 5 scores in Pong
+    cursor.execute(
+        "SELECT username, score AS p_score, STRFTIME('%d/%m/%Y', datetime) AS p_date FROM pong WHERE username=? ORDER BY score DESC LIMIT 5 OFFSET 1;",
+        (self.get_username(),))
+    p_rows = cursor.fetchall()
+    conn.commit()
+
+    if p_rows:
+        for element in p_rows:
+            po_return_list.append(element)
+    else:
+        po_return_list.append((0, 0, 0))
+
+    # query the database for the player's top 5 scores in Snake
+    cursor.execute(
+        "SELECT username, score AS sn_score, STRFTIME('%d/%m/%Y', datetime) AS sn_date FROM snake WHERE username=? ORDER BY score DESC LIMIT 5 OFFSET 1;",
+        (self.get_username(),))
+    sn_rows = cursor.fetchall()
+    conn.commit()
+
+    if sn_rows:
+        for element in sn_rows:
+            sn_return_list.append(element)
+    else:
+        sn_return_list.append((0, 0, 0))
+
+    # returns list with scores ordered: flappy bird, space invaders, pong, snake
+    return fl_return_list, sp_return_list, po_return_list, sn_return_list
+
+def view_leaderboard():
+    # pull from db and print out in pop-up window
+    lb_fl_return_list = []
+    lb_sp_return_list = []
+    lb_po_return_list = []
+    lb_sn_return_list = []
+
+    # query the database for the Top 5 scores in Flappy Bird
+    lb_f_rows = get_top_players("flappy")
+    if lb_f_rows:
+        for f_element in lb_f_rows:
+            lb_fl_return_list.append(f_element)
+    else:
+        lb_fl_return_list.append((0, 0, 0))
+
+    # query the database for the Top 5 scores in Space Invaders
+    lb_space_rows = get_top_players("space")
+    if lb_space_rows:
+        for sp_element in lb_space_rows:
+            lb_sp_return_list.append(sp_element)
+    else:
+        lb_sp_return_list.append((0, 0, 0))
+
+    # query the database for the Top 5 scores in Pong
+    lb_po_rows = get_top_players("pong")
+    if lb_po_rows:
+        for po_element in lb_po_rows:
+            lb_sp_return_list.append(po_element)
+    else:
+        lb_sp_return_list.append((0, 0, 0))
+
+    # query the database for the Top 5 scores in Snake
+    cursor.execute(
+        "SELECT username, score AS sn_score, STRFTIME('%d/%m/%Y', datetime) AS sn_date FROM snake ORDER BY score DESC LIMIT 5 OFFSET 1;",
+        )
+    lb_sn_rows = cursor.fetchall()
+    conn.commit()
+    if lb_sn_rows:
+        for sn_element in lb_sn_rows:
+            lb_sn_return_list.append(sn_element)
+    else:
+        lb_sn_return_list.append((0, 0, 0))
+
+    # returns list with scores ordered: flappy bird, space invaders, pong, snake
+    return lb_fl_return_list, lb_sp_return_list, lb_po_return_list, lb_sn_return_list
 
 
 def encrypt(pwd):
@@ -242,7 +324,6 @@ class Player:
         cursor.execute(
             "SELECT username, score AS f_score, STRFTIME('%d/%m/%Y', datetime) AS f_date FROM flappy WHERE username=? ORDER BY score DESC LIMIT 5",
             (self.get_username(),))
-        # cursor.execute("SELECT MAX(score) FROM flappy WHERE username = ?", (self.get_username(),))
         f_rows = cursor.fetchall()
         conn.commit()
 
@@ -252,7 +333,7 @@ class Player:
         else:
             fl_return_list.append((0,0,0))
 
-        # pull space invaders data
+        # query the database for the player's top 5 scores in Space Invaders
         cursor.execute(
             "SELECT username, score AS sp_score, STRFTIME('%d/%m/%Y', datetime) AS sp_date FROM space WHERE username=? ORDER BY score DESC LIMIT 5",
             (self.get_username(),))
@@ -263,9 +344,9 @@ class Player:
             for element in sp_rows:
                 sp_return_list.append(element)
         else:
-            sp_return_list.append((0,0,0))
+            sp_return_list.append((0, 0, 0))
 
-        # pull pong data
+        # query the database for the player's top 5 scores in Pong
         cursor.execute(
             "SELECT username, score AS p_score, STRFTIME('%d/%m/%Y', datetime) AS p_date FROM pong WHERE username=? ORDER BY score DESC LIMIT 5",
             (self.get_username(),))
@@ -276,9 +357,9 @@ class Player:
             for element in p_rows:
                 po_return_list.append(element)
         else:
-            po_return_list.append((0,0,0))
+            po_return_list.append((0, 0, 0))
 
-        # pull snake data
+        # query the database for the player's top 5 scores in Snake
         cursor.execute(
             "SELECT username, score AS sn_score, STRFTIME('%d/%m/%Y', datetime) AS sn_date FROM snake WHERE username=? ORDER BY score DESC LIMIT 5",
             (self.get_username(),))
@@ -289,7 +370,7 @@ class Player:
             for element in sn_rows:
                 sn_return_list.append(element)
         else:
-            sn_return_list.append((0,0,0))
+            sn_return_list.append((0, 0, 0))
 
         # returns list with scores ordered: flappy bird, space invaders, pong, snake
         return fl_return_list, sp_return_list, po_return_list, sn_return_list
@@ -496,76 +577,166 @@ while True:
                                                                 
             sg.popup_scrolled(stats_string, title=player.get_username(), font=16)
 
-       
+
         elif event == 'High Scores':
-            print("[USER] Overall High scores")
+
+            if DEBUG:
+                print("[USER] Overall High scores")
+
             high_score_string = ""
+
             # iterate through all data, or we could have a high scores
+
             high_score_string += "Overall High Scores\n---------------------\n\n"
 
-            # FLAPPY BIRD OVERALL HIGH SCORE
-            flappy_score, flappy_player = get_high_scores("flappy")
-            high_score_string += "Flappy Bird ---------------> " + flappy_player + "\t" + str(flappy_score) + "\n\n"
-            # SPACE INVADERS OVERALL HIGH SCORE
-            si_score, si_player = get_high_scores("space")
-            high_score_string += "Space Invaders -----------> " + si_player + "\t" + str(si_score) + "\n\n"
-            # PONG OVERALL HIGH SCORE - NOT WORKING!!!
-            pong_score, pong_player = get_high_scores("pong")
-            high_score_string += "Pong ---------------------> " + pong_player + "\t" + str(pong_score) + "\n\n"
-            # SNAKE OVERALL HIGH SCORE
-            snake_score, snake_player = get_high_scores("snake")
-            high_score_string += "Snake --------------------> " + snake_player + "\t" + str(snake_score) + "\n\n"
-            # high score string that appears in popup
+            lb_fl_high_score_list, lb_sp_high_score_list, lb_po_high_score_list, lb_sn_high_score_list = view_leaderboard()
 
-            # high score popup
-            sg.popup_scrolled(high_score_string, title="Retro Arcade High Scores", font=16)
+            high_score_string = "Leaderboards\n*******************\n\tFlappy " \
+ \
+                                "Bird:\n\t-------------------------"
+
+            while len(lb_fl_high_score_list) != 25:
+                lb_fl_high_score_list.append((0, 0, 0))
+
+            counter = 1
+
+            for score in lb_fl_high_score_list:
+                high_score_string += "\n\t " + str(counter) + ". " + str(score[0]) + " " + str(score[1])
+
+                counter += 1
+
+            high_score_string += "\n\n\tSpace Invaders:\n\t-------------------------"
+
+            while len(lb_sp_high_score_list) != 25:
+                lb_sp_high_score_list.append((0, 0, 0))
+
+            counter = 1
+
+            for score in lb_sp_high_score_list:
+                high_score_string += "\n\t " + str(counter) + ". " + str(score[0]) + " " + str(score[1])
+
+                counter += 1
+
+            high_score_string += "\n\n\tPong:\n\t-------------------------"
+
+            while len(lb_po_high_score_list) != 25:
+                lb_po_high_score_list.append((0, 0, 0))
+
+            counter = 1
+
+            for score in lb_po_high_score_list:
+                high_score_string += "\n\t " + str(counter) + ". " + str(score[0]) + " " + str(score[1])
+
+                counter += 1
+
+            high_score_string += "\n\n\tSnake:\n\t-------------------------"
+
+            while len(lb_sn_high_score_list) != 25:
+                lb_sn_high_score_list.append((0, 0, 0))
+
+            counter = 1
+
+            for score in lb_sn_high_score_list:
+                high_score_string += "\n\t " + str(counter) + ". " + str(score[0]) + " " + str(score[1])
+
+                counter += 1
+             # high score popup
+            sg.popup_scrolled(high_score_string, title="Retro Arcade Leaderboard", font=16)
+
 
         elif event == 'Top Players':
             # top player string that will be printed out in popup
-            top_string = "Top 5 Players\n\nFlappy Bird\n"
+            punc = '''!()-[]{};:'"\ <>./?@#$%^&*_~'''
+            top_string = "\t\tTop 10 Players\n-------------------------------------------------\n\nFlappy Bird:\n"
 
-            # FLAPPY BIRD TOP 5
+            # FLAPPY BIRD TOP 10
 
             cursor.execute("""SELECT username, score
-                                           FROM pong
+                                           FROM flappy
                                            GROUP BY username, score
                                            ORDER BY score DESC
-                                           LIMIT 5 OFFSET 1""")
-            rows = cursor.fetchall()
+                                           LIMIT 10 OFFSET 1""")
+            lb_frows = cursor.fetchall()
             conn.commit()
-            top_string += "\n\tUsername\t\tScore\n\t--------------------------------------------\n"
+
             num = 1
-            for element in rows:
+            for element in lb_frows:
                 toString = str(element)
                 uname, points = toString.split(',')
-                top_string += "\t" + str(num) + ".\t" + uname + '\t\t' + points + '\n'
+                for ele in uname:
+                    if ele in punc:
+                        uname = uname.replace(ele, "")
+                top_string += "\t" + str(num) + ".\t" + uname + '\n'
                 num += 1
             num = 0
             top_string += "\n"
-            # flappy_list = get_top_player("flappy")
-            # for player_ in flappy_list:
-            #    top_string += "\t" + player_ + "\n"
 
-            # SPACE INVADER TOP 5
-            top_string += "Space Invaders\n"
-            si_list = get_top_player("space")
-            for player_ in si_list:
-                top_string += "\t" + player_ + "\n"
+            # SPACE INVADER TOP 10
+            cursor.execute("""SELECT username, score
+                                                       FROM space
+                                                       GROUP BY username, score
+                                                       ORDER BY score DESC
+                                                       LIMIT 10 OFFSET 1""")
+            lb_sp_rows = cursor.fetchall()
+            conn.commit()
+            top_string += "Space Invaders:\n"
+            num = 1
+            for element in lb_sp_rows:
+                toString = str(element)
+                uname, points = toString.split(',')
+                for ele in uname:
+                    if ele in punc:
+                        uname = uname.replace(ele, "")
+                top_string += "\t" + str(num) + ".\t" + uname + '\n'
+                num += 1
+            num = 0
+            top_string += '\n'
 
-            # PONG TOP 5 - NOT WORKING -DB COLUMNS DO NOT MATCH OTHER TABLES
-            # top_string += "Pong\n"
-            # pong_list = get_top_player("pong")
-            # for player in pong_list:
-            #     top_string += "\t" + player + "\n"
+            # PONG TOP 10
+            cursor.execute("""SELECT username, score
+                                                                   FROM pong
+                                                                   GROUP BY username, score
+                                                                   ORDER BY score DESC
+                                                                   LIMIT 10 OFFSET 1""")
+            lb_po_rows = cursor.fetchall()
+            conn.commit()
+            top_string += "Pong:\n"
+
+            num = 1
+
+            for element in lb_po_rows:
+                toString = str(element)
+                uname, points = toString.split(',')
+                for ele in uname:
+                    if ele in punc:
+                        uname = uname.replace(ele, "")
+                top_string += "\t" + str(num) + ".\t" + uname + '\n'
+                num += 1
+            num = 0
+
 
             # SNAKE TOP 5
-            top_string += "Snake\n"
-            snake_list = get_top_player("snake")
-            for player_ in snake_list:
-                top_string += "\t" + player_ + "\n"
+            cursor.execute("""SELECT username, score
+                                                                               FROM snake
+                                                                               GROUP BY username, score
+                                                                               ORDER BY score DESC
+                                                                               LIMIT 10 OFFSET 1""")
+            lb_sn_rows = cursor.fetchall()
+            conn.commit()
+            top_string += "\nSnake:\n"
+            num = 1
+            for element in lb_sn_rows:
+                toString = str(element)
+                uname, points = toString.split(',')
+                for ele in uname:
+                    if ele in punc:
+                        uname = uname.replace(ele, "")
+                top_string += "\t" + str(num) + ".\t" + uname + '\n'
+                num += 1
+            num = 0
 
             # prints out top players for all of the games
-            sg.popup(top_string, title="Top Players", font=16)
+            sg.popup_scrolled(top_string, title="Top Players", font=16)
 
         elif event == 'Sign Out':
             # returns to main window
