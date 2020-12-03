@@ -500,30 +500,23 @@ while True:
        
         elif event == 'High Scores':
             print("[USER] Overall High scores")
-
+            high_score_string = ""
             # iterate through all data, or we could have a high scores
+            high_score_string += "Overall High Scores\n---------------------\n\n"
+
             # FLAPPY BIRD OVERALL HIGH SCORE
             flappy_score, flappy_player = get_high_scores("flappy")
-
+            high_score_string += "Flappy Bird ---------------> " + flappy_player + "\t" + str(flappy_score) + "\n\n"
             # SPACE INVADERS OVERALL HIGH SCORE
             si_score, si_player = get_high_scores("space")
-
+            high_score_string += "Space Invaders -----------> " + si_player + "\t" + str(si_score) + "\n\n"
             # PONG OVERALL HIGH SCORE - NOT WORKING!!!
-            # pong_score, pong_player = get_high_scores("pong")
-            pong_score = 0
-            pong_player = "NOT WORKING PROPERLY"
-
+            pong_score, pong_player = get_high_scores("pong")
+            high_score_string += "Pong ---------------------> " + pong_player + "\t" + str(pong_score) + "\n\n"
             # SNAKE OVERALL HIGH SCORE
             snake_score, snake_player = get_high_scores("snake")
-
+            high_score_string += "Snake --------------------> " + snake_player + "\t" + str(snake_score) + "\n\n"
             # high score string that appears in popup
-            high_score_string = "High Scores\nFlappy Bird: " + str(flappy_score
-                                                                   ) + " (Username: " + flappy_player + ")\nSpace Invaders: " + str(
-                si_score
-            ) + " (Username: " + si_player + ")\nPong: " + str(pong_score
-                                                               ) + " (Username: " + pong_player + "\nSnake: " + str(
-                snake_score
-            ) + " (Username: " + snake_player + ")\n"
 
             # high score popup
             sg.popup_scrolled(high_score_string, title="Retro Arcade High Scores", font=16)
