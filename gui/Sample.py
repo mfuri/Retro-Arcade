@@ -1,8 +1,7 @@
 ##################################################################
 #                       TO DO: 12-01-2020                        #
 # -------------------------------------------------------------- #
-#   1. [HIGHEST PRIORITY]  Fix bugs in Pong                      #
-#   2. [HIGH PRIORITY]  Finish writing HS queries                #
+#                                                                #
 #   3. [MED. PRIORITY]  Fix Encryption                           #
 #   4. [MED. PRIORITY]  Try to "break" program for debugging     #
 #   5. [LOW PRIORITY]   Check results of return login
@@ -176,7 +175,7 @@ class Player:
         _Username = register_uname
         _Pass = pwd
         # ##### SOME POP UP FOR THIS? ############
-        if self.invalid_username(register_uname):
+        if not self.invalid_username(register_uname):
             if DEBUG:
                 print("Error: Username can only contain alphanumeric characters.")
             return 4
@@ -187,7 +186,7 @@ class Player:
             if DEBUG:
                 print("[SQLite] Success: Added username: ", player.get_username(), "\t with password: ",
                       player.get_password())
-
+            return 0
     def login(self, login_uname, pwd):
         if self._is_logged_in:
             self._is_logged_in = False  # make sure class variable '_is_logged_in' is set to False before trying to login
@@ -645,13 +644,16 @@ while True:
 
                 Username = values.get('Username')
                 Password = values.get('Password')
-                player.register(Username, Password)
-
-                player.set_login_status("True")
-                sql_signup_query = cursor.execute("INSERT OR IGNORE INTO user(username, password) VALUES(?,?);",
+                if player.register(Username, Password) == 4:
+                    sg.popup_ok('Invalid characters entered. Please enter another.', title="Invalid Entry", font=14)
+                    successful_info = False
+                    unsuccessful_info = True
+                else:
+                    player.set_login_status("True")
+                    sql_signup_query = cursor.execute("INSERT OR IGNORE INTO user(username, password) VALUES(?,?);",
                                                   (player.get_username(), player.get_password(),))
-                conn.commit()  # finalize transaction
-                print("[SQLite] Success: Added username: ", player.get_username(), "\t with password: ",
+                    conn.commit()  # finalize transaction
+                    print("[SQLite] Success: Added username: ", player.get_username(), "\t with password: ",
                       player.get_password())
 
         # CHECK FOR COMPLETE FIELDS FOR SIGN IN
