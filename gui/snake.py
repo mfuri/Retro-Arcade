@@ -3,13 +3,13 @@ import sys
 import time
 import random
 import pygame.locals
-from os import environ
+from os import environ #importing neccessary libraries
 from pygame.locals import *
 environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
-
+#definition for the snake game and neccessary features used through program
 def Snake():
-    FPS = 15
-    pygame.init()
+    FPS = 15 #controlling how fast the snake should be going
+    pygame.init() #initializing pygame
     fpsClock = pygame.time.Clock()
     red = (255, 0, 0)
     green = (99, 255, 32)
@@ -37,10 +37,12 @@ def Snake():
 
     screen.blit(surface, (0, 0))
 
+    #defining the draw box to open the window for the game
     def draw_box(surf, color, pos):
         r = pygame.Rect((pos[0], pos[1]), (GRIDSIZE, GRIDSIZE))
         pygame.draw.rect(surf, color, r)
 
+    #definition for the start screen
     def startScreen():
         font = pygame.font.Font(None, 36)
         text = font.render("Press Space to Start", True, (255, 255, 255))
@@ -50,6 +52,7 @@ def Snake():
         screen.blit(window, oect)
         screen.blit(text, oect)
 
+    #definition for the screen when the player loses
     def loseScreen():
         font = pygame.font.Font(None, 36)
         text = font.render("Press Space to Continue", True, (255, 255, 255))
@@ -59,14 +62,17 @@ def Snake():
         screen.blit(window, oect)
         screen.blit(text, oect)
 
+    #definition for the snake class
     class Snake(object):
         def __init__(self):
             self.lose()
             self.color = (green)
 
+        #definition to get the spot in which the snakes head is
         def get_head_position(self):
             return self.positions[0]
 
+        #definition for function that executes when player loses
         def lose(self):
             self.length = 1
             self.positions = [((SCREEN_WIDTH / 2), (SCREEN_HEIGHT / 2))]
@@ -75,6 +81,7 @@ def Snake():
             pygame.mixer.music.stop()
             print("Death to the snake")
 
+        #definition to award points for when a apple is eaten
         def point(self, pt):
             if self.length > 2 and (pt[0] * -1, pt[1] * -1) == self.direction:
                 print(pt[0] * -1, pt[1] * -1)
@@ -83,7 +90,8 @@ def Snake():
             else:
                 self.direction = pt
                 return True
-
+        #definition for function that makes snake move
+        #Code inspired from this video https://www.youtube.com/watch?v=9bBgyOkoBQ0
         def move(self):
             cur = self.positions[0]
             x, y = self.direction
@@ -94,24 +102,25 @@ def Snake():
                 self.positions.insert(0, new)
                 if len(self.positions) > self.length:
                     self.positions.pop()
-
+        #definition to draw the snake
         def draw(self, surf):
             for p in self.positions:
                 draw_box(surf, self.color, p)
 
+    #defintion for the apple class
     class Apple(object):
         def __init__(self):
             self.position = (0, 0)
             self.color = (red)
             self.randomize()
-
+        #defintion to draw the apple
         def draw(self, surf):
             draw_box(surf, self.color, self.position)
-
+        #defintion to put the apple in a random spot on screen
         def randomize(self):
             self.position = (
             random.randint(0, GRID_WIDTH - 1) * GRIDSIZE, random.randint(0, GRID_HEIGHT - 1) * GRIDSIZE)
-
+    #definition to check if the snake has eaten an apple
     def check_eat(snake, apple):
         if snake.get_head_position() == apple.position:
             snake.length = snake.length + 1
@@ -119,13 +128,13 @@ def Snake():
             pygame.mixer.Sound.play(eatSound)
             pygame.mixer.music.stop()
             print("Snake has eaten an apple")
-
+    #setting variables to class objects and boolean flags
     player = Snake()
     goal = Apple()
     start = True
     lost = False
     highest_score = 0
-
+    #do this when start is true, navigate the game
     while True:
         player = Snake()
         goal = Apple()
@@ -154,7 +163,7 @@ def Snake():
             tRect = text.get_rect(center=((SCREEN_WIDTH / 2), (SCREEN_HEIGHT / 2) - 85))
             screen.blit(text, tRect)
             pygame.display.flip()
-
+        #while the game is running, navigate the game fairly
         while running:
             for event in pygame.event.get():
                 if event.type == KEYDOWN:
@@ -185,11 +194,12 @@ def Snake():
                     if player.length > highest_score:
                         highest_score = player.length
                     return highest_score
-                    
+            #if the player loses, execute this code block
             if lost:
                 player = Snake()
                 goal = Apple()
                 break
+            #do this in case of a new high score
             if player.length > highest_score:
                 highest_score = player.length
             surface.fill(black)
@@ -198,6 +208,7 @@ def Snake():
             player.draw(surface)
             goal.draw(surface)
             player.move()
+            #following code sets the windows properly and updates it
 
             font = pygame.font.Font(None, 36)
             text = font.render(str(player.length), 1, (white))
@@ -208,7 +219,7 @@ def Snake():
             pygame.display.flip()
             pygame.display.update()
             fpsClock.tick(FPS)
-
+        #entire this while loop in case we lose
         while lost:
             surface.fill(black)
             pygame.display.update()
@@ -222,10 +233,12 @@ def Snake():
                     if player.length > highest_score:
                         highest_score = player.length
                     return highest_score
-
+            #print a loss screen
             font = pygame.font.Font(None, 30)
             text = font.render("You lose. Press Space to Continue", 1, white, black)
             tRect = text.get_rect(center=((SCREEN_WIDTH / 2), (SCREEN_HEIGHT / 2) - 110))
             screen.blit(text, tRect)
             pygame.display.flip()
     pygame.display.quit()
+#ending the game
+#code inspiration for moving https://www.youtube.com/watch?v=9bBgyOkoBQ0
