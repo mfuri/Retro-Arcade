@@ -1,5 +1,5 @@
 # pong game for SE project
-# Seth Polen SE project 2020
+# Teammate SE project 2020
 import turtle   # built in no need to install
 
 start = False

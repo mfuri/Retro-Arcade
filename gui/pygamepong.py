@@ -2,7 +2,7 @@
 
 import pygame
 from pygame.locals import *
-#Seth Polen
+#Teammate
 #switched because turtle wasn't very intuitive with start screen
 
 def PongGame():

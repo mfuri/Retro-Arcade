@@ -1,6 +1,6 @@
 # Retro Arcade CEN4090L Project
 # filename: highscores_setup.py
-# author: Andrew
+# author: Teammate
 
 import sqlite3
 from sqlite3 import Error

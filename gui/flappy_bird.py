@@ -1,7 +1,7 @@
 #Flappy Bird Source Code
 #high score should be number of seconds
 #press space to continue or q to quit
-#contributers: Michael and Mackenzie
+#contributers: Michael and Teammate
 
 import random
 import os

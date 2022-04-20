@@ -1,7 +1,7 @@
 #Space Invaders Source Code
 #high score in aliens destroyed
 #press space to shoot and arrow keys to move or q to quit
-#contributers: Michael and Mackenzie
+#contributers: Michael and Teammate
 
 import random
 import copy
